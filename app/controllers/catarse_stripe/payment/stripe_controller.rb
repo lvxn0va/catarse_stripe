@@ -1,9 +1,9 @@
 require 'catarse_stripe/processors'
 
 module CatarseStripe::Payment
-	  class StripeController < ApplicationController
+    class StripeController < ApplicationController
 
-	  skip_before_filter :verify_authenticity_token, :only => [:notifications]
+    skip_before_filter :verify_authenticity_token, :only => [:notifications]
     skip_before_filter :detect_locale, :only => [:notifications]
     skip_before_filter :set_locale, :only => [:notifications]
     skip_before_filter :force_http
@@ -53,25 +53,36 @@ module CatarseStripe::Payment
     def pay
       backer = current_user.backs.find params[:id]
       begin
-        response = @@gateway.setup_purchase(backer.price_in_cents, {
+
+        customer = Stripe::Customer.create(
+          :email => backer.email
+          :card => params[:stripeToken]
+        )
+
+        response = @@gateway.purchase(
+          :customer => customer.id
+          :amount => backer.price_in_cents,
+          :currency => 'usd',
+          :description => t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value) 
+
+          {
           ip: request.remote_ip,
           return_url: payment_success_stripe_url(id: backer.id),
           cancel_return_url: payment_cancel_stripe_url(id: backer.id),
-          currency_code: 'US',
-          description: t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value),
           notify_url: payment_notifications_stripe_url(id: backer.id)
-        })
+          }
+        )
 
         backer.update_attribute :payment_method, 'Stripe'
-        backer.update_attribute :payment_token, response.token
+        backer.update_attribute :payment_token, response.id
 
         build_notification(backer, response.params)
 
-        redirect_to @@gateway.redirect_url_for(response.token)
+        redirect_to payment_success_stripe_url(id: backer.id)
       rescue Exception => e
         ::Airbrake.notify({ :error_class => "Paypal Error", :error_message => "Paypal Error: #{e.inspect}", :parameters => params}) rescue nil
         Rails.logger.info "-----> #{e.inspect}"
-        paypal_flash_error
+        stripe_flash_error
         return redirect_to main_app.new_project_backer_path(backer.project)
       end
     end
@@ -96,7 +107,7 @@ module CatarseStripe::Payment
         paypal_flash_success
         redirect_to main_app.thank_you_project_backer_path(project_id: backer.project.id, id: backer.id)
       rescue Exception => e
-        ::Airbrake.notify({ :error_class => "Paypal Error", :error_message => "Paypal Error: #{e.message}", :parameters => params}) rescue nil
+        ::Airbrake.notify({ :error_class => "Stripe Error", :error_message => "Stripe Error: #{e.message}", :parameters => params}) rescue nil
         Rails.logger.info "-----> #{e.inspect}"
         paypal_flash_error
         return redirect_to main_app.new_project_backer_path(backer.project)
@@ -117,7 +128,7 @@ module CatarseStripe::Payment
     end
 
     def stripe_flash_error
-      flash[:failure] = t('paypal_error', scope: SCOPE)
+      flash[:failure] = t('stripe_error', scope: SCOPE)
     end
 
     def stripe_flash_success
@@ -125,10 +136,10 @@ module CatarseStripe::Payment
     end
 
     def setup_gateway
-      if ::Configuration[:stripe_api_key] and ::Configuration[:stripe_secret_key]
+      if ::Configuration[:stripe_api_key]# and ::Configuration[:stripe_secret_key]
         @@gateway ||= ActiveMerchant::Billing::StripeGateway.new({
-          :api_key => ::Configuration[:stripe_api_key]
-          :secret_key => ::Configuration[:stripe_secret_key]
+          :login => ::Configuration[:stripe_api_key]
+          #:login => ::Configuration[:stripe_secret_key]
         })
       else
         puts "[Stripe] API key is required to make requests to Stripe"

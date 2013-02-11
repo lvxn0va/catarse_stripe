@@ -65,12 +65,12 @@ module CatarseStripe::Payment
           :currency => 'usd',
           :description => t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value) 
 
-          {
-          ip: request.remote_ip,
-          return_url: payment_success_stripe_url(id: backer.id),
-          cancel_return_url: payment_cancel_stripe_url(id: backer.id),
-          notify_url: payment_notifications_stripe_url(id: backer.id)
-          }
+          #{
+          #ip: request.remote_ip,
+          #return_url: payment_success_stripe_url(id: backer.id),
+          #cancel_return_url: payment_cancel_stripe_url(id: backer.id),
+          #notify_url: payment_notifications_stripe_url(id: backer.id)
+          #}
         )
 
         backer.update_attribute :payment_method, 'Stripe'

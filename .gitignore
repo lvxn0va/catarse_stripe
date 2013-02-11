@@ -6,4 +6,4 @@ test/dummy/log/*.log
 test/dummy/tmp/
 test/dummy/.sass-cache
 test/dummy/
-catarse_stripe-0.0.1.gem
+catarse_stripe-*.gem

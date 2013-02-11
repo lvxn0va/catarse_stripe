@@ -55,12 +55,12 @@ module CatarseStripe::Payment
       begin
 
         customer = Stripe::Customer.create(
-          :email => backer.email
+          :email => backer.email,
           :card => params[:stripeToken]
         )
 
         response = @@gateway.purchase(
-          :customer => customer.id
+          :customer => customer.id,
           :amount => backer.price_in_cents,
           :currency => 'usd',
           :description => t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value) 

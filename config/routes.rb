@@ -1,4 +1,4 @@
-CatarseStripe::Engine.routes.draw 
+CatarseStripe::Engine.routes.draw do
   namespace :payment do
     get '/stripe/:id/review' => 'stripe#review', :as => 'review_stripe'
     post '/stripe/notifications' => 'stripe#ipn',  :as => 'ipn_stripe'

@@ -1,0 +1,1 @@
+PaymentEngines.register({name: 'stripe', review_path: ->(backer){ CatarseStripe::Engine.routes.url_helpers.payment_review_stripe_path(backer) }, locale: 'en'})

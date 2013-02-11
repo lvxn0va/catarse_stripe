@@ -1,0 +1,14 @@
+en:
+  projects:
+    backers:
+      review:
+        stripe: 'Stripe'
+        international:
+          section_title: 'You will be directed to the Stripe site to complete payment.'
+          user_document_label: 'CPF / CNPJ (only for Brazilians)'
+          button: 'Redirect to Payment By Stripe'
+      checkout:
+        stripe_cancel: "Your Stripe payment was canceled. Please try again."
+        stripe_description: "Back project %{project_name} with %{value} (USD)"
+        stripe_error: "Ooops. There was an error while sending your payment to Stripe. Please try again."
+        success: "Your back was successfully made. Thanks a lot!"

@@ -1,0 +1,13 @@
+= javascript_include_tag 'catarse_stripe'
+
+h3= t('projects.backers.review.international.section_title')
+
+#catarse_stripe_form
+  = form_tag payment_pay_stripe_path(params[:id]) do
+    .clearfix
+    .bootstrap-twitter
+      = label_tag 'user_document', t('projects.backers.review.international.user_document_label')
+      .clearfix
+      = text_field_tag 'user_document', nil, { autocomplete: 'off' }
+      .loader.hide= image_tag 'loading.gif'
+      = submit_tag t('projects.backers.review.international.button'), :class => 'btn btn-primary btn-large'

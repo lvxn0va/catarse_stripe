@@ -1,7 +1,6 @@
-<%= form_tag payment_pay_stripe_path(params[:id]) do %>
+
 
   <script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button"
           data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
           data-description="t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value)"
           data-amount="(backer.price_in_cents)"></script>
-<% end %>

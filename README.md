@@ -1,3 +1,5 @@
+## The stripe_controller is a work in progress and things will be changing very rapidly. BEWARE!
+
 # CatarseStripe
 
 Catarse Stripe integration with [Catarse](http://github.com/danielweinmann/catarse) crowdfunding platform

@@ -54,7 +54,7 @@ module CatarseStripe::Payment
       backer = current_user.backs.find params[:id]
       begin
         customer = Stripe::Customer.create(
-          email: backer.email,
+          email: backer.payer_email,
           card: params[:stripeToken]
         )
 

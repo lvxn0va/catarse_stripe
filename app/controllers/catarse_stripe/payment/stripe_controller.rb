@@ -53,24 +53,16 @@ module CatarseStripe::Payment
     def pay
       backer = current_user.backs.find params[:id]
       begin
-
         customer = Stripe::Customer.create(
-          :email => backer.email,
-          :card => params[:stripeToken]
+          email: backer.email,
+          card: params[:stripeToken]
         )
 
         response = @@gateway.purchase(
-          :customer => customer.id,
-          :amount => backer.price_in_cents,
-          :currency => 'usd',
-          :description => t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value) 
-
-          #{
-          #ip: request.remote_ip,
-          #return_url: payment_success_stripe_url(id: backer.id),
-          #cancel_return_url: payment_cancel_stripe_url(id: backer.id),
-          #notify_url: payment_notifications_stripe_url(id: backer.id)
-          #}
+          customer: customer.id,
+          amount: backer.price_in_cents,
+          currency: 'usd',
+          description: t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value)
         )
 
         backer.update_attribute :payment_method, 'Stripe'

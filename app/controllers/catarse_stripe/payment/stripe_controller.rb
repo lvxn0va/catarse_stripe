@@ -15,7 +15,10 @@ module CatarseStripe::Payment
     layout :false
 
     def review
-
+      respond_to do |format|
+        format.js
+        format.html
+      end
     end
 
     def ipn

@@ -1,7 +1,7 @@
 h3= t('projects.backers.review.international.section_title')
 
 #catarse_stripe_form
-  = form_tag payment_pay_stripe_path(params[:id]) do
+  = form_for @backer payment_pay_stripe_path(params[:id]) do
     .clearfix
     .bootstrap-twitter
       = label_tag      :card_number, 'Credit Card Number'
@@ -17,8 +17,11 @@ h3= t('projects.backers.review.international.section_title')
       = select_month Date.today.month, { add_month_numbers: true }, { name: nil, id: 'card_month' }
       = select_year  nil, { start_year: Date.today.year, end_year: Date.today.year + 6 }, { name: nil, id: 'card_year' }
 
-      .noscript
+      #noscript
         JavaScript is not enabled and is required for this form. First enable it in your web browser settings.
+    .clearfix
+    .bootstrap-twitter
+      .loader.hide= image_tag('loading.gif')
       = submit_tag t('projects.backers.review.international.button'), :class => 'btn btn-primary btn-large'
 
 

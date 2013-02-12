@@ -8,7 +8,7 @@ module CatarseStripe::Payment
     skip_before_filter :set_locale, :only => [:notifications]
     skip_before_filter :force_http
 
-    before_filter :setup_gateway
+    #before_filter :setup_gateway
 
     SCOPE = "projects.backers.checkout"
 
@@ -58,7 +58,7 @@ module CatarseStripe::Payment
           card: params[:stripeToken]
         )
 
-        response = @@gateway.purchase(
+        response = Stripe::Charge.create(
           customer: customer.id,
           amount: backer.price_in_cents,
           currency: 'usd',

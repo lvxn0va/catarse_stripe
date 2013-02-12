@@ -16,9 +16,8 @@ h3= t('projects.backers.review.international.section_title')
       .input
         = f.text_field :email, :class => "field" , :placeholder => 'you@example.com'
 
-    #credit-card style="display:none" : "display:block"
-      #credit-card-errors style="display:none"
-        #stripe-error-message.alert-message.block-message.error
+    #credit-card-errors style="display: 'none'"
+      #stripe-error-message.alert-message.block-message.error
 
       /! these fields are disabled before submission and are never transmitted back to rails
       .clearfix

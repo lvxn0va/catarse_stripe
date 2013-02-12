@@ -4,7 +4,7 @@ h3= t('projects.backers.review.international.section_title')
 
 #catarse_stripe_form
   = form_tag payment_pay_stripe_path(params[:id]) do
-    <script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button" data-key="<%= Rails.configuration.stripe[:stripe_api_key] %>"></script>
+    script type="text/javascript" src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button" data-key="<%= Rails.configuration.stripe[:stripe_api_key] %>"
 
 
 

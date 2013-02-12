@@ -1,7 +1,7 @@
 h3= t('projects.backers.review.international.section_title')
 
 #catarse_stripe_form
-  = form_for (@backer, payment_pay_stripe_path(params[:id])) do |f|
+  = form_for @backer,  url: payment_pay_stripe_path(params[:id]) do |f|
     .clearfix
     .bootstrap-twitter
       = f.label_tag      :card_number, 'Credit Card Number'

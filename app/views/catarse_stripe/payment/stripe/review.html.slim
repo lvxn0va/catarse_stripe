@@ -3,7 +3,7 @@
 h3= t('projects.backers.review.international.section_title')
 
 #catarse_stripe_form
-  = form_tag payment_pay_stripe_path(params[:id]) do
+  = form_tag payment_pay_stripe_path(params[:id])  do |f|
     .clearfix
       = f.label :first, 'First and last name'
       .input

@@ -1,5 +1,0 @@
-h3= t('projects.backers.review.international.section_title')
-
-= form_tag payment_pay_stripe_path(params[:id]) do
-  .clearfix
-  script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button" data-key="<%= Rails.configuration.stripe[:publishable_key] %>"

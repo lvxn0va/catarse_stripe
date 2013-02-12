@@ -1,4 +1,6 @@
-<%= javascript_include_tag "https://checkout.stripe.com/v2/checkout.js" %>
 <%= form_tag payment_pay_stripe_path(params[:id]) do %>
-  <script class="stripe-button" data-key="<%= Rails.configuration.stripe[:publishable_key] %>"></script>
+
+  <script src="https://checkout.stripe.com/v2/checkout.js" type="text/javascript" class="stripe-button"
+          data-key="<%= Rails.configuration.stripe[:publishable_key] %>">
+  </script>
 <% end %>

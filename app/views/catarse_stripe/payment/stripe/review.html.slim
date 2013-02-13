@@ -3,13 +3,13 @@ script src="https://js.stripe.com/v1/"
 h3= t('projects.backers.review.international.section_title')
 
 #catarse_stripe_form
-  = form_for (backer),  :url => payment_pay_stripe_path(backer) do |f|
+  = form_tag payment_pay_stripe_path(params[:id]) do |f|
     - if @backer.errors.any?
       h2 Something went wrong!
       ul.errors
         - @backer.errors.full_messages.each do |msg|
           li= msg
-    = f.hidden_field :stripe_card_token
+    = f.hidden_field_tag :stripe_card_token
     .clearfix
     .bootstrap-twitter
       = f.label_tag      :card_number, 'Credit Card Number'

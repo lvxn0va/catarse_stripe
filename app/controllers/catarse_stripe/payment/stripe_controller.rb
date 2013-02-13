@@ -103,7 +103,7 @@ module CatarseStripe::Payment
       backer = current_user.backs.find params[:id]
       begin
         details = Stripe::Charge.retrieve(
-            customer: backer.payment_token
+            customer: backer.payment_token,
             id: backer.payment_id
           )
 

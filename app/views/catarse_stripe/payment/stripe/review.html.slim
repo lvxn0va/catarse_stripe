@@ -1,10 +1,8 @@
-script src="https://js.stripe.com/v1/"
-
 h3= t('projects.backers.review.international.section_title')
 
-#catarse_stripe_form
+#stripe
   = form_tag payment_pay_stripe_path(params[:id]) do |f|
-    = f.hidden_field :stripe_card_token
+    = f.hidden_field_tag :stripe_card_token
     .clearfix
     .bootstrap-twitter
       = f.label_tag      :card_number, 'Credit Card Number'

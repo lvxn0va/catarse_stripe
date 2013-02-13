@@ -4,11 +4,6 @@ h3= t('projects.backers.review.international.section_title')
 
 #catarse_stripe_form
   = form_tag payment_pay_stripe_path(params[:id]) do |f|
-    - if @backer.errors.any?
-      h2 Something went wrong!
-      ul.errors
-        - @backer.errors.full_messages.each do |msg|
-          li= msg
     = f.hidden_field_tag :stripe_card_token
     .clearfix
     .bootstrap-twitter

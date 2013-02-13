@@ -6,5 +6,6 @@ CatarseStripe::Engine.routes.draw do
     match '/stripe/:id/pay'           => 'stripe#pay',            :as => 'pay_stripe'
     match '/stripe/:id/success'       => 'stripe#success',        :as => 'success_stripe'
     match '/stripe/:id/cancel'        => 'stripe#cancel',         :as => 'cancel_stripe'
+    match '/stripe/:id/checkout'        => 'stripe#checkout',         :as => 'checkout_stripe'
   end
 end

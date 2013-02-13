@@ -1,25 +1,79 @@
-h3= t('projects.backers.review.international.section_title')
-
-#catarse_stripe_form
-  = form_for @backer,  url: payment_pay_stripe_path(params[:id]) do |f|
-    .clearfix
-    .bootstrap-twitter
-      = f.label_tag      :card_number, 'Credit Card Number'
-      = f.text_field_tag :card_number, nil, name: nil, maxlength: 16
-
-      = f.label_tag      :card_code, 'Security Code (CVV)'
-      = f.text_field_tag :card_code, nil, name: nil, maxlength: 4
-
-      = f.label_tag      :card_zip, 'Billing Zip Code'
-      = f.text_field_tag :card_zip, '', maxlength: 5
-
-      = f.label_tag :card_month, 'Card Expiration'
-      = f.select_month Date.today.month, { add_month_numbers: true }, { name: nil, id: 'card_month' }
-      = f.select_year  nil, { start_year: Date.today.year, end_year: Date.today.year + 6 }, { name: nil, id: 'card_year' }
-
-      #noscript
-        JavaScript is not enabled and is required for this form. First enable it in your web browser settings.
-      .clearfix
-      .bootstrap-twitter
-        .loader.hide= image_tag('loading.gif')
-        = f.submit_tag t('projects.backers.review.international.button'), :class => 'btn btn-primary btn-large'
+/! Button to trigger modal
+a.btn data-toggle="modal" href="#donateModal" role="button"
+#donateModal.modal.hide role="dialog"
+  form.form-horizontal action="/echo/html" method="post"
+    .modal-header
+      button.close aria-hidden="true" data-dismiss="modal" type="button"
+      h3 Donate Form
+    .modal-body
+      .control-group
+        label.control-label for="first-name"
+        .controls
+          input#first-name autocomplete="name" name="first-name" reqired="" type="text"
+      .control-group
+        label.control-label for="last-name"
+        .controls
+          input#last-name name="last-name" reqired="" type="text" x-autocompletetype="name-full"
+      .control-group
+        label.control-label for="email"
+        .controls
+          .input-prepend
+            span.add-on
+              i.icon-envelope
+            input#email name="email" reqired="" type="email" x-autocompletetype="email"
+      .control-group
+        label.control-label for="amount"
+        .controls
+          .input-prepend
+            span.add-on $
+            input#amount.input-mini name="amount" type="number"
+      .control-group
+        label.control-label for="card"
+        #stripe-button-holder.controls
+          /! Stripe Button
+          script.stripe-button data-key="pk_cfS4TB2HbaVyabCWqYObX9vE0DY9h" data-label="Add Card" data-panel-label="Save" src="https://button.stripe.com/v1/button.js"
+      .control-group
+        label.control-label for="anonymous"
+        .controls
+          label.checkbox data-content="Tick this box and we will not show your name in the list of pledgers" data-placement="top" rel="popover" title="Anonymous Donation"
+            input#anonymous name="anonymous" type="checkbox"
+            | Keep my donation anonymous
+      .control-group
+        .controls
+          label.checkbox
+            input#tos-agreed name="tos-agreed" required="" type="checkbox"
+            | I Agree to the
+            a data-toggle="modal" href="#tos-modal"
+      fieldset
+        legend.s1 Optional Information
+        div
+        .control-group
+          label.control-label for="company"
+          .controls
+            input#company name="company" type="text" x-autocompletetype="organization"
+        .control-group
+          label.control-label for="website"
+          .controls
+            .input-prepend
+              span.add-on
+                i.icon-globe
+              input#website name="website" type="url" x-autocompletetype="url"
+        .control-group
+          label.control-label for="phone"
+          .controls
+            .input-prepend
+              span.add-on
+                i.icon-phone
+              input#phone.input-medium name="phone" type="tel" x-autocompletetype="phone-full"
+        .control-group
+          label.control-label for="referrer"
+            small How did you hear about us?
+          .controls
+            input#referrer name="referrer" placeholder="Google, Friend..." type="text"
+        .control-group
+          label.control-label for="notes"
+          .controls
+            textarea#notes.input-xlarge name="notes" placeholder="Any message you may have for us." rows="2"
+    .modal-footer
+      .pull-right
+        button.btn.btn-success.btn-large Send Pledge

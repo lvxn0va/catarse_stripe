@@ -18,6 +18,10 @@ module CatarseStripe::Payment
     
     end
 
+    def checkout
+
+    end
+
     def ipn
       backer = Backer.where(:payment_id => params['txn_id']).first
       if backer

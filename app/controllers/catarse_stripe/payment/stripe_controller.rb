@@ -20,14 +20,12 @@ module CatarseStripe::Payment
 
     def checkout
       backer = current_user.backs.find params[:id]
-      
+
       respond_to do |format|
         format.html
         format.js
       end
     end 
-
-    end
 
     def ipn
       backer = Backer.where(:payment_id => params['txn_id']).first

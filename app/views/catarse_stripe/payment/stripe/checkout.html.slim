@@ -31,7 +31,7 @@ a.btn data-toggle="modal" href="#donateModal" role="button"
         label.control-label for="card"
         #stripe-button-holder.controls
           /! Stripe Button
-          script.stripe-button data-key="pk_cfS4TB2HbaVyabCWqYObX9vE0DY9h" data-label="Add Card" data-panel-label="Save" src="https://button.stripe.com/v1/button.js"
+          script.stripe-button data-key="#{Configuration['stripe_api_key']}" data-label="Add Card" data-panel-label="Save" src="https://button.stripe.com/v1/button.js"
       .control-group
         label.control-label for="anonymous"
         .controls

@@ -87,12 +87,8 @@ module CatarseStripe::Payment
         backer.update_attribute :payment_token, response.customer #Stripe Backer Customer_id
         backer.update_attribute :payment_id, response.id #Stripe Backer Payment Id
 
-        if backer.update_attributes(params)
-          redirect_to payment_success_stripe_url(id: backer.id)
-        else
-          stripe_flash_error
-          redirect_to main_app.new_project_backer_path(backer.project)
-        end
+      
+        redirect_to payment_success_stripe_url(id: backer.id)
       rescue Exception => e
         ::Airbrake.notify({ :error_class => "Stripe #Pay Error", :error_message => "Stripe #Pay Error: #{e.inspect}", :parameters => params}) rescue nil
         Rails.logger.info "-----> #{e.inspect}"

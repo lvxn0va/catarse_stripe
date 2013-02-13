@@ -1,5 +1,5 @@
 <%= form_tag payment_pay_stripe_path(params[:id]) do %>
 
   <script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button"
-          data-key="<%= (::Configuration[:stripe_api__key]) %>"></script>
+          data-key="<%= (::Configuration[:stripe_api_key]) %>"></script>
 <% end %>

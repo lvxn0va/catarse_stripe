@@ -84,7 +84,7 @@ module CatarseStripe::Payment
         )
 
         backer.update_attribute :payment_method, 'Stripe'
-        backer.update_attribute :payment_token, response.customer_id #Stripe Backer Customer_id
+        backer.update_attribute :payment_token, response.customer #Stripe Backer Customer_id
         backer.update_attribute :payment_id, response.id #Stripe Backer Payment Id
 
 

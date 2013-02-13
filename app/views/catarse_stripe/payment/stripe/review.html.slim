@@ -3,11 +3,11 @@ script src="https://js.stripe.com/v1/"
 h3= t('projects.backers.review.international.section_title')
 
 #catarse_stripe_form
-  = form_for (@backer,  url: payment_pay_stripe_path) do |f|
-    - if @purchase.errors.any?
+  = form_for @backer,  :url => payment_pay_stripe_path do |f|
+    - if @backer.errors.any?
       h2 Something went wrong!
       ul.errors
-        - @purchase.errors.full_messages.each do |msg|
+        - @backer.errors.full_messages.each do |msg|
           li= msg
     = f.hidden_field :stripe_card_token
     .clearfix

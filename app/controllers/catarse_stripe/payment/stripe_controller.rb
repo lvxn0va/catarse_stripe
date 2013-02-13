@@ -25,6 +25,15 @@ module CatarseStripe::Payment
         format.html
         format.js
       end
+    end
+
+    def charge
+      backer = current_user.backs.find params[:id]
+
+      respond_to do |format|
+        format.html
+        format.js
+      end
     end 
 
     def ipn

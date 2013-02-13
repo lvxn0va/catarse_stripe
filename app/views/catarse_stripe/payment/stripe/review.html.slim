@@ -1,10 +1,38 @@
-= javascript_include_tag 'catarse_stripe'
+script src="https://js.stripe.com/v1/"
 
 h3= t('projects.backers.review.international.section_title')
 
 #catarse_stripe_form
-  = form_tag payment_pay_stripe_path(params[:id]) do
-    script type="text/javascript" src="/catarse_stripe/stripe_checkout.js" class="stripe-button" data-key="<%= Rails.configuration.stripe[:stripe_secret_key] %>"
+  = form_for (@backer,  url: payment_pay_stripe_path) do |f|
+    - if @purchase.errors.any?
+      h2 Something went wrong!
+      ul.errors
+        - @purchase.errors.full_messages.each do |msg|
+          li= msg
+    = f.hidden_field :stripe_card_token
+    .clearfix
+    .bootstrap-twitter
+      = f.label_tag      :card_number, 'Credit Card Number'
+      = f.text_field_tag :card_number, nil, name: nil, maxlength: 16
+
+      = f.label_tag      :card_code, 'Security Code (CVV)'
+      = f.text_field_tag :card_code, nil, name: nil, maxlength: 4
+
+      = f.label_tag      :card_zip, 'Billing Zip Code'
+      = f.text_field_tag :card_zip, '', maxlength: 5
+
+      = f.label_tag :card_month, 'Card Expiration'
+      = f.select_month Date.today.month, { add_month_numbers: true }, { name: nil, id: 'card_month' }
+      = f.select_year  nil, { start_year: Date.today.year, end_year: Date.today.year + 6 }, { name: nil, id: 'card_year' }
+
+      #noscript
+        JavaScript is not enabled and is required for this form. First enable it in your web browser settings.
+      .clearfix
+      .bootstrap-twitter
+        .loader.hide= image_tag('loading.gif')
+        = f.submit t('projects.backers.review.international.button'), :class => 'btn btn-primary btn-large'
+
+
 
 
 

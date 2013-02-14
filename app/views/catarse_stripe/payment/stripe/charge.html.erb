@@ -26,29 +26,10 @@
 		        <h2>Crowdfunding Payments with Stripe</h2>
 		        <p>You've chosen to contribute using a credit card. Stripe payments for customers in US and Canada allow you to use your Visa, Mastercard or Amex. Credit Card information is not stored on the crowdfunding website, and is safely stored on Stripe's servers. For more info visit <a href="http://stripe.com"><b>STRIPE PAYMENTS</b></a></p>
 				    <%= form_tag payment_pay_stripe_path(params[:id]) do %>
-						  <script src="https://checkout.stripe.com/v2/checkout.js"></script>
-
-						  <button id="customButton">Contribute With Stripe</button>
-
-						  <script>
-						    $('#customButton').click(function(){
-						      var token = function(res){
-						        console.log('Got token ID:', res.id);
-						      };
-
-						      StripeCheckout.open({
-						        key:         'pk_0TofLEX9n7baBwirc2xo1dHtDm8e0',
-						        address:     true,
-						        panelLabel:  'Checkout',
-						        token:       token
-						      });
-
-						      return false;
-						    });
-						  </script>
+						  <script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button" data-key="<%= (::Configuration[:stripe_api_key]) data-address="true" data-label="Charge" %>"></script>
 						<% end %>
 						</stripe-field>
-				    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+				    <script src="http://code.jquery.com/jquery.js"></script>
 				    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
 			    </div>
 		    </div>

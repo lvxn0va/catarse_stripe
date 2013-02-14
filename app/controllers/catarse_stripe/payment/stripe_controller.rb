@@ -101,7 +101,7 @@ module CatarseStripe::Payment
     def success
       backer = current_user.backs.find params[:id]
       begin
-        details = Stripe::Charge.retrieve(customer: backer.payment_token, id: backer.payment_id)
+        details = Stripe::Charge.retrieve(id: backer.payment_id)
 
         response = JSON.parse details
 

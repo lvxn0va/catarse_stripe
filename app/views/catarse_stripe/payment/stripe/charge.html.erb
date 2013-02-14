@@ -7,12 +7,14 @@
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
   </head>
   <body>
-   <div class="container">
-    <%= form_tag payment_pay_stripe_path(params[:id]) do %>
-		  <script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button" data-key="<%= (::Configuration[:stripe_api_key]) %>"></script>
-		<% end %>
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
-   </div>
+	   <div class="container">
+		    <div class="row"
+			    <%= form_tag payment_pay_stripe_path(params[:id]) do %>
+					  <script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button" data-key="<%= (::Configuration[:stripe_api_key]) %>"></script>
+					<% end %>
+			    <script src="http://code.jquery.com/jquery.js"></script>
+			    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
+		    </div>
+	   </div>
   </body>
 </html>

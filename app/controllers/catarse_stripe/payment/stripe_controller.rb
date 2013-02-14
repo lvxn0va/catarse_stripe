@@ -85,10 +85,10 @@ module CatarseStripe::Payment
         )
 
         backer.update_attributes({
-          :payment_method, 'Stripe',
-          :payment_token, response.customer, #Stripe Backer Customer_id
-          :payment_id, response.id, #Stripe Backer Payment Id
-          :confirmed, response.paid #Paid = True, Confirmed =  true
+          :payment_method => 'Stripe',
+          :payment_token => response.customer, #Stripe Backer Customer_id
+          :payment_id => response.id, #Stripe Backer Payment Id
+          :confirmed => response.paid #Paid = True, Confirmed =  true
         })
         backer.save
 

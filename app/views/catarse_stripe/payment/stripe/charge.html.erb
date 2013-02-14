@@ -1,7 +1,18 @@
-<body>
-<div class="container">
-		<%= form_tag payment_pay_stripe_path(params[:id]) do %>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stripe Payment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="https://github.com/netdna/bootstrap-cdn/blob/master/css/bootstrap.css" rel="stylesheet" media="screen">
+  </head>
+  <body>
+   <div class="container">
+    <%= form_tag payment_pay_stripe_path(params[:id]) do %>
 		  <script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button" data-key="<%= (::Configuration[:stripe_api_key]) %>"></script>
 		<% end %>
-</div>
-</body>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+   </div>
+  </body>
+</html>

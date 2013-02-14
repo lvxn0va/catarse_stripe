@@ -95,10 +95,10 @@ module CatarseStripe::Payment
         build_notification(backer, response)
       
         redirect_to payment_success_stripe_url(id: backer.id)
-      rescue Exception => e
+      rescue Stripe::CardError => e
         ::Airbrake.notify({ :error_class => "Stripe #Pay Error", :error_message => "Stripe #Pay Error: #{e.inspect}", :parameters => params}) rescue nil
         Rails.logger.info "-----> #{e.inspect}"
-        stripe_flash_error
+        flash[:error] = e.message
         return redirect_to main_app.new_project_backer_path(backer.project)
       end
     end
@@ -110,10 +110,6 @@ module CatarseStripe::Payment
           id: backer.payment_id
           )
 
-        # we must get the deatils after the purchase in order to get the transaction_id
-        # - TODO remove OLD Active Merchant code 
-        # details = @@gateway.details_for(backer.payment_token)
-
         build_notification(backer, details)
 
         if details.id
@@ -121,10 +117,10 @@ module CatarseStripe::Payment
         end
         stripe_flash_success
         redirect_to main_app.thank_you_project_backer_path(project_id: backer.project.id, id: backer.id)
-      rescue Exception => e
+      rescue Stripe::CardError => e
         ::Airbrake.notify({ :error_class => "Stripe Error", :error_message => "Stripe Error: #{e.message}", :parameters => params}) rescue nil
         Rails.logger.info "-----> #{e.inspect}"
-        stripe_flash_error
+        flash[:error] = e.message
         return redirect_to main_app.new_project_backer_path(backer.project)
       end
     end

@@ -87,6 +87,7 @@ module CatarseStripe::Payment
         backer.update_attribute :payment_method, 'Stripe'
         backer.update_attribute :payment_token, response.customer #Stripe Backer Customer_id
         backer.update_attribute :payment_id, response.id #Stripe Backer Payment Id
+        backer.update_attribute :confirmed, response.paid #Paid = True, Confirmed =  true
 
       
         redirect_to payment_success_stripe_url(id: backer.id)
@@ -103,7 +104,7 @@ module CatarseStripe::Payment
       begin
         details = Stripe::Charge.retrieve(id: backer.payment_id)
 
-        response = JSON.parse details
+        data = JSON.parse details
 
         # we must get the deatils after the purchase in order to get the transaction_id
         # - TODO remove OLD Active Merchant code 

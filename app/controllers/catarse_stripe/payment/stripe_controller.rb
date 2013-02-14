@@ -1,8 +1,9 @@
 require 'catarse_stripe/processors'
+require 'json'
 
 module CatarseStripe::Payment
     class StripeController < ApplicationController
-
+    
     skip_before_filter :verify_authenticity_token, :only => [:notifications]
     skip_before_filter :detect_locale, :only => [:notifications]
     skip_before_filter :set_locale, :only => [:notifications]
@@ -100,26 +101,25 @@ module CatarseStripe::Payment
     def success
       backer = current_user.backs.find params[:id]
       begin
-        details = Stripe::Charge.retrieve(
-            customer: backer.payment_token,
-            id: backer.payment_id
-          )
+        details = Stripe::Charge.retrieve(customer: backer.payment_token, id: backer.payment_id)
+
+        response = JSON.parse details
 
         # we must get the deatils after the purchase in order to get the transaction_id
         # - TODO remove OLD Active Merchant code 
         # details = @@gateway.details_for(backer.payment_token)
 
-        build_notification(backer, details.response)
+        build_notification(backer, response)
 
-        if details.response['id'] 
-          backer.update_attribute :payment_id, details.response['id']
+        if response['id'] 
+          backer.update_attribute :payment_id, response['id']
         end
         stripe_flash_success
         redirect_to main_app.thank_you_project_backer_path(project_id: backer.project.id, id: backer.id)
       rescue Exception => e
         ::Airbrake.notify({ :error_class => "Stripe Error", :error_message => "Stripe Error: #{e.message}", :parameters => params}) rescue nil
         Rails.logger.info "-----> #{e.inspect}"
-        paypal_flash_error
+        stripe_flash_error
         return redirect_to main_app.new_project_backer_path(backer.project)
       end
     end

@@ -1,4 +1,5 @@
 ## The stripe_controller is a work in progress and things will be changing very rapidly. BEWARE!
+### Tests are non-funtional at this point and will be adjusted to Stripe soon!
 
 # CatarseStripe
 
@@ -6,9 +7,10 @@ Catarse Stripe integration with [Catarse](http://github.com/danielweinmann/catar
 
 ## Installation
 
-Add this lines to your Catarse application's Gemfile:
+Add this lines to your Catarse application's Gemfile under the payments section:
 
-    gem 'catarse_stripe'
+    gem 'catarse_stripe', :git => 'git://github.com/lvxn0va/catarse_stripe.git'
+    gem 'stripe', :git => 'https://github.com/stripe/stripe-ruby'
 
 And then execute:
 
@@ -20,7 +22,9 @@ Configure the routes for your Catarse application. Add the following lines in th
 
     mount CatarseStripe::Engine => "/", :as => "catarse_stripe"
 
-### Configurations
+### Configurations  
+
+Signup for an account at [STRIPE PAYMENTS](http://www.stripe.com) - Go into your account settings and get your API Keys - Be sure to use your 'Test' keys until you're ready to go live. Alos make sure the live/test toggle in the Dashboard is appropriately set.
 
 Create this configurations into Catarse database:
 

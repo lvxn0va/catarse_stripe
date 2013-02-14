@@ -1,7 +1,6 @@
 = javascript_include_tag 'catarse_stripe'
 
 h3= t('projects.backers.review.international.section_title')
-
 #catarse_stripe_form
   = form_tag payment_charge_stripe_path(params[:id]) do
     .clearfix
@@ -10,7 +9,7 @@ h3= t('projects.backers.review.international.section_title')
       .clearfix
       /!= text_field_tag 'user_document', nil, { autocomplete: 'off' }
       .loader.hide= image_tag 'loading.gif'
-      = submit_tag t('projects.backers.review.international.button'), :class => 'btn btn-primary btn-large'
+    = submit_tag t('projects.backers.review.international.button'), :class => 'btn btn-primary btn-large'
 
 
 

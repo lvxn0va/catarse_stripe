@@ -84,12 +84,15 @@ module CatarseStripe::Payment
           description: t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value)
         )
 
-        backer.update_attribute :payment_method, 'Stripe'
-        backer.update_attribute :payment_token, response.customer #Stripe Backer Customer_id
-        backer.update_attribute :payment_id, response.id #Stripe Backer Payment Id
-        #backer.update_attribute :payer_name, response.name
-        backer.update_attribute :confirmed, response.paid #Paid = True, Confirmed =  true
+        backer.update_attributes({
+          :payment_method, 'Stripe',
+          :payment_token, response.customer, #Stripe Backer Customer_id
+          :payment_id, response.id, #Stripe Backer Payment Id
+          :confirmed, response.paid #Paid = True, Confirmed =  true
+        })
+        backer.save
 
+        build_notification(backer, response)
       
         redirect_to payment_success_stripe_url(id: backer.id)
       rescue Exception => e
@@ -103,20 +106,18 @@ module CatarseStripe::Payment
     def success
       backer = current_user.backs.find params[:id]
       begin
-        response = Stripe::Charge.retrieve(
+        details = Stripe::Charge.retrieve(
           id: backer.payment_id
           )
-
-        #data = JSON.parse(response)
 
         # we must get the deatils after the purchase in order to get the transaction_id
         # - TODO remove OLD Active Merchant code 
         # details = @@gateway.details_for(backer.payment_token)
 
-        #build_notification(backer, data)
+        build_notification(backer, details)
 
-        if response.id
-          backer.update_attribute :payment_id, response.id
+        if details.id
+          backer.update_attribute :payment_id, details.id
         end
         stripe_flash_success
         redirect_to main_app.thank_you_project_backer_path(project_id: backer.project.id, id: backer.id)

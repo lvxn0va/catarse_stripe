@@ -9,6 +9,7 @@ module CatarseStripe::Payment
     skip_before_filter :set_locale, :only => [:notifications]
     skip_before_filter :force_http
 
+    #Disable ActiveMerchant::Stripe in favor of Stripe gem
     #before_filter :setup_gateway
 
     SCOPE = "projects.backers.checkout"
@@ -17,15 +18,6 @@ module CatarseStripe::Payment
 
     def review
     
-    end
-
-    def checkout
-      backer = current_user.backs.find params[:id]
-
-      respond_to do |format|
-        format.html
-        format.js
-      end
     end
 
     def charge
@@ -38,33 +30,38 @@ module CatarseStripe::Payment
     end 
 
     def ipn
-      backer = Backer.where(:payment_id => params['txn_id']).first
+      backer = Backer.where(:payment_id => details.id).first
       if backer
         notification = backer.payment_notifications.new({
           extra_data: JSON.parse(params.to_json.force_encoding(params['charset']).encode('utf-8'))
         })
         notification.save!
         backer.update_attributes({
-          :payment_service_fee => params['mc_fee'],
-          :payer_email => params['payer_email']
+          :payment_service_fee => details.fee,
+          :address_street => details.address,
+          :address_city => details.address_city,
+          :address_state => details.address_state,
+          :address_zip => details.address_zip
         })
       end
       return render status: 200, nothing: true
-    rescue Exception => e
+    rescue Stripe::CardError => e
       ::Airbrake.notify({ :error_class => "Stripe Notification Error", :error_message => "Stripe Notification Error: #{e.inspect}", :parameters => params}) rescue nil
       return render status: 200, nothing: true
     end
 
     def notifications
       backer = Backer.find params[:id]
-      response = @@gateway.details_for(backer.payment_token)
-      if response.params['transaction_id'] == params['txn_id']
-        build_notification(backer, response.params)
+      details = Stripe::Charge.retrieve(
+          id: backer.payment_id
+          )
+      if details.paid = true
+        build_notification(backer, details)
         render status: 200, nothing: true
       else
         render status: 404, nothing: true
       end
-    rescue Exception => e
+    rescue Stripe::CardError => e
       ::Airbrake.notify({ :error_class => "Stripe Notification Error", :error_message => "Stripe Notification Error: #{e.inspect}", :parameters => params}) rescue nil
       render status: 404, nothing: true
     end

@@ -14,7 +14,13 @@ module CatarseStripe::Payment
 
     SCOPE = "projects.backers.checkout"
 
-    layout :false
+    layout :false, :except => :charge
+
+    def authorize
+    
+    end
+
+
 
     def review
     
@@ -36,13 +42,7 @@ module CatarseStripe::Payment
           extra_data: JSON.parse(params.to_json.force_encoding(params['charset']).encode('utf-8'))
         })
         notification.save!
-        backer.update_attributes({
-          :payment_service_fee => details.fee,
-          :address_street => details.address,
-          :address_city => details.address_city,
-          :address_state => details.address_state,
-          :address_zip => details.address_zip
-        })
+        backer.update_attribute :payment_service_fee => details.fee
       end
       return render status: 200, nothing: true
     rescue Stripe::CardError => e
@@ -85,6 +85,10 @@ module CatarseStripe::Payment
           :payment_method => 'Stripe',
           :payment_token => response.customer, #Stripe Backer Customer_id
           :payment_id => response.id, #Stripe Backer Payment Id
+          :address_street => details.address,
+          :address_city => details.address_city,
+          :address_state => details.address_state,
+          :address_zip => details.address_zip,
           :confirmed => response.paid #Paid = True, Confirmed =  true
         })
         backer.save

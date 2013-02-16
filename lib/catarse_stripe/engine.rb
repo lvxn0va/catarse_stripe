@@ -5,15 +5,15 @@
 #end
 module ActionDispatch::Routing
   class Mapper
-    def mount_catarse_stripe_at(mount_location)
-      scope mount_location do
-          get 'payment/stripe/:id/review' => 'payment/stripe#review', :as => 'review_stripe'
-          post 'payment/stripe/notifications' => 'payment/stripe#ipn',  :as => 'ipn_stripe'
-          match 'payment/stripe/:id/notifications' => 'payment/stripe#notifications',  :as => 'notifications_stripe'
-          match 'payment/stripe/:id/pay'           => 'payment/stripe#pay',            :as => 'pay_stripe'
-          match 'payment/stripe/:id/success'       => 'payment/stripe#success',        :as => 'success_stripe'
-          match 'payment/stripe/:id/cancel'        => 'paymentstripe#cancel',         :as => 'cancel_stripe'
-          match 'payment/stripe/:id/charge'        => 'paymentstripe#charge',         :as => 'charge_stripe'
+    def mount_catarse_stripe_at(payment)
+      scope payment do
+          get '/stripe/:id/review' => 'stripe#review', :as => 'review_stripe'
+          post '/stripe/notifications' => 'stripe#ipn',  :as => 'ipn_stripe'
+          match '/stripe/:id/notifications' => 'stripe#notifications',  :as => 'notifications_stripe'
+          match '/stripe/:id/pay'           => 'stripe#pay',            :as => 'pay_stripe'
+          match '/stripe/:id/success'       => 'stripe#success',        :as => 'success_stripe'
+          match '/stripe/:id/cancel'        => 'stripe#cancel',         :as => 'cancel_stripe'
+          match '/stripe/:id/charge'        => 'stripe#charge',         :as => 'charge_stripe'
       end
     end
   end

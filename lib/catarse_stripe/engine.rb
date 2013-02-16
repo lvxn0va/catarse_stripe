@@ -7,13 +7,13 @@ module ActionDispatch::Routing
   class Mapper
     def mount_catarse_stripe_at(catarse_stripe)
       scope :payment do
-        get '/stripe/:id/review' => 'catarse_stripe/payment/stripe#review', :as => 'review_stripe'
-        post '/stripe/notifications' => 'catarse_stripe/payment/stripe#ipn',  :as => 'ipn_stripe'
-        match '/stripe/:id/notifications' => 'catarse_stripe/payment/stripe#notifications',  :as => 'notifications_stripe'
-        match '/stripe/:id/pay'           => 'catarse_stripe/payment/stripe#pay',            :as => 'pay_stripe'
-        match '/stripe/:id/success'       => 'catarse_stripe/payment/stripe#success',        :as => 'success_stripe'
-        match '/stripe/:id/cancel'        => 'catarse_stripe/payment/stripe#cancel',         :as => 'cancel_stripe'
-        match '/stripe/:id/charge'        => 'catarse_stripe/payment/stripe#charge',         :as => 'charge_stripe'
+        get '/payment/stripe/:id/review' => 'catarse_stripe/payment/stripe#review', :as => 'payment_review_stripe'
+        post '/payment/stripe/notifications' => 'catarse_stripe/payment/stripe#ipn',  :as => 'payment_ipn_stripe'
+        match '/payment/stripe/:id/notifications' => 'catarse_stripe/payment/stripe#notifications',  :as => 'payment_notifications_stripe'
+        match '/payment/stripe/:id/pay'           => 'catarse_stripe/payment/stripe#pay',            :as => 'payment_pay_stripe'
+        match '/payment/stripe/:id/success'       => 'catarse_stripe/payment/stripe#success',        :as => 'payment_success_stripe'
+        match '/payment/stripe/:id/cancel'        => 'catarse_stripe/payment/stripe#cancel',         :as => 'payment_cancel_stripe'
+        match '/payment/stripe/:id/charge'        => 'catarse_stripe/payment/stripe#charge',         :as => 'payment_charge_stripe'
       end
     end
   end

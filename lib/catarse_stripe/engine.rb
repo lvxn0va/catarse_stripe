@@ -6,7 +6,7 @@
 module ActionDispatch::Routing
   class Mapper
     def mount_catarse_stripe_at(catarse_stripe)
-      namespace :payment do
+      scope :payment do
           get '/stripe/:id/review' => 'stripe#review', :as => 'review_stripe'
           post '/stripe/notifications' => 'stripe#ipn',  :as => 'ipn_stripe'
           match '/stripe/:id/notifications' => 'stripe#notifications',  :as => 'notifications_stripe'

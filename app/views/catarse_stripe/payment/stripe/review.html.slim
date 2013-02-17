@@ -1,11 +1,30 @@
 /!= javascript_include_tag 'catarse_stripe'
 = javascript_include_tag "https://checkout.stripe.com/v2/checkout.js"
-= javascript_include_tag "https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js">
+= javascript_include_tag "https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"
 
 h3= t('projects.backers.review.international.section_title')
 #catarse_stripe_form
   = form_tag payment_charge_stripe_path(params[:id]) do
     <button id="customButton">Purchase</button>
+
+    javascript:
+      $('#customButton').click(function(){
+        var token = function(res){
+          console.log('Got token ID:', res.id);
+        };
+
+        StripeCheckout.open({
+          key:         'pk_0TofLEX9n7baBwirc2xo1dHtDm8e0',
+          address:     true,
+          amount:      5000,
+          name:        'Joes Pistachios',
+          description: 'A bag of Pistachios',
+          panelLabel:  'Checkout',
+          token:       token
+        });
+
+        return false;
+      });
     .clearfix
     .bootstrap-twitter
       /!= label_tag 'user_document', t('projects.backers.review.international.user_document_label')
@@ -13,6 +32,8 @@ h3= t('projects.backers.review.international.section_title')
       /!= text_field_tag 'user_document', nil, { autocomplete: 'off' }
       .loader.hide= image_tag 'loading.gif'
       = submit_tag t('projects.backers.review.international.button'), :class => 'btn btn-primary btn-large'
+
+script.stripe-button data-address="true" data-key=((::Configuration[:stripe_api_key])) data-label="Contribute With Stripe" src="https://checkout.stripe.com/v2/checkout.js"
 
 
 

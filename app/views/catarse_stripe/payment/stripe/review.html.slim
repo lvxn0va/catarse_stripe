@@ -6,33 +6,7 @@ p You've chosen to contribute using a credit card. Stripe payments for customers
 
 #catarse_stripe_form
   = form_tag payment_pay_stripe_path(params[:id]) do
-    <button id="customButton">"Pay With Stripe"</button>
-
-    javascript:
-      $('#customButton').click(function(){
-        var token = function(res){
-          console.log('Got token ID:', res.id);
-        };
-
-        StripeCheckout.open({
-          key:         'pk_0TofLEX9n7baBwirc2xo1dHtDm8e0',
-          address:     true,
-          panelLabel:  'Checkout',
-          token:       token
-        });
-
-        // Stripe Button Triggers formDomElement.submit().
-        // We intercept it and notify user we have received the token
-        var paymentForm = $('#payment-form')[0];
-        paymentForm.original_submit = paymentForm.submit;
-        
-        paymentForm.submit = function() {
-          $("#stripe-button-holder .stripe-button-inner").html('<span class="label label-success"><i class="icon-ok"></i> Card Added</span>');
-          return false;
-        };
-
-        return false;
-      });
+    <button class="stripe-button" data-key="pk_0TofLEX9n7baBwirc2xo1dHtDm8e0"</button>
 
 
 

@@ -14,7 +14,7 @@ module CatarseStripe::Payment
 
     SCOPE = "projects.backers.checkout"
 
-    layout :false, :except => :charge
+    layout :false
 
     def authorize
     

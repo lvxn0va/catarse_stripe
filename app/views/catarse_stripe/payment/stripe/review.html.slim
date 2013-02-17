@@ -1,4 +1,4 @@
-= javascript_include_tag 'catarse_stripe'
+/!= javascript_include_tag 'catarse_stripe'
 
 h3= t('projects.backers.review.international.section_title')
 #catarse_stripe_form
@@ -10,7 +10,8 @@ h3= t('projects.backers.review.international.section_title')
       /!= text_field_tag 'user_document', nil, { autocomplete: 'off' }
       .loader.hide= image_tag 'loading.gif'
       = submit_tag t('projects.backers.review.international.button'), :class => 'btn btn-primary btn-large'
-    <script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button" data-key="<%= (::Configuration[:stripe_api_key])%>" data-address="true" data-label="Contribute With Stripe"></script>
+
+<script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button" data-key="<%= (::Configuration[:stripe_api_key])%>" data-address="true" data-label="Contribute With Stripe"></script>
 
 
 

@@ -1,28 +1,29 @@
-head
-  <title>Stripe Connect</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
-    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
-    css
-	    body{background-color: #e5e5e5;}
-	    div.container { position: relative;}
-	    div.row { position: absolute; margin:50px;}
-	    div.stripe-field { 
-        position:absolute; 
-        left: 0; 
-        right: 0; 
-        margin-left: auto; 
-        margin-right: auto;
-        }
-body
-	.bootstrap-twitter
-	  .container
-	    .row
-	      .span4
-	        .stripe-field
+doctype
+html
+  head
+    title Stripe Payment
+    meta content="width=(device-width,)initial-scale=1.0" name="viewport"
+    /! Bootstrap
+    link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet"
+    css:
+      | body{background-color: #e5e5e5;}
+      | div.container { position: relative;}
+      | div.row { position: absolute; margin:50px;}
+      | div.stripe-field {
+          | position:absolute;
+          | left: 0;
+          | right: 0;
+          | margin-left: auto;
+          | margin-right: auto;
+          | }
+  body
+    .container
+      .row
+        .span4
+          .stripe-field
 						h2 Stripe Connect
 						p In order to use Stripe payments as your processor, you'll need to connect and create a Stripe account. You can do that easily through the Crowdfunding platform. NOTE: To be PCI compliant and avoid credit card Aggregation you'll need to have a separate stripe account for each project you create.
 						br
 						= link_to image_tag('/auth/stripe_blue.png', :title => 'Stripe Payments Connect'), 'main_app.auth_path(:stripe-connect)'
-					<script src="http://code.jquery.com/jquery.js"></script>
-				  <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
+					  script src="http://code.jquery.com/jquery.js"
+            script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"

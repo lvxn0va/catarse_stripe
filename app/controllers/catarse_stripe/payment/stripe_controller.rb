@@ -13,14 +13,25 @@ module CatarseStripe::Payment
     #before_filter :setup_gateway
 
     SCOPE = "projects.backers.checkout"
+    SCOPE = "users.projects"
 
     layout :false
 
-    def authorize
     
+    def connect
+      @user = current_user.find params[:id]
+
+      respond_to do |format|
+        format.html
+        format.js
+      end
     end
 
-
+    #def auth
+      #if @user.stripe_key.present?
+        #render :text => "You have already connected a Stripe account. Your Stripe Key is #{@user.stripe_key}."
+      #end
+    #end
 
     def review
     

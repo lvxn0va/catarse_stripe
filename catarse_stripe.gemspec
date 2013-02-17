@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency "activemerchant", ">= 1.17.0"
   s.add_dependency "stripe", :git => 'https://github.com/stripe/stripe-ruby'
   s.add_dependency "omniauth-stripe-connect"
-  #s.add_dependency "stripe_event"
+  s.add_dependency "stripe_event"
 
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency "factory_girl_rails"

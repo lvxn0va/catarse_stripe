@@ -7,23 +7,8 @@ p You've chosen to contribute using a credit card. Stripe payments for customers
 
 #catarse_stripe_form
   = form_tag payment_pay_stripe_path(params[:id]) do
-    <button id="customButton">Pay With Stripe</button>
-
-    javascript:
-      $('#customButton').click(function(){
-        var token = function(res){
-          console.log('Got token ID:', res.id);
-        };
-
-        StripeCheckout.open({
-          key:         'pk_0TofLEX9n7baBwirc2xo1dHtDm8e0',
-          address:     true,
-          panelLabel:  'Checkout',
-          token:       token
-        });
-
-        return false;
-      });
+    script:
+      src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button" data-key="<%= (::Configuration[:stripe_api_key])%>" data-address="true" data-label="Contribute With Stripe"
 
 
 

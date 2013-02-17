@@ -85,10 +85,10 @@ module CatarseStripe::Payment
           :payment_method => 'Stripe',
           :payment_token => response.customer, #Stripe Backer Customer_id
           :payment_id => response.id, #Stripe Backer Payment Id
-          :address_street => details.address,
-          :address_city => details.address_city,
-          :address_state => details.address_state,
-          :address_zip => details.address_zip,
+          :address_street => response.address,
+          :address_city => response.address_city,
+          :address_state => response.address_state,
+          :address_zip => response.address_zip,
           :confirmed => response.paid #Paid = True, Confirmed =  true
         })
         backer.save

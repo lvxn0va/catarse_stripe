@@ -14,4 +14,22 @@ CATARSE.StripeForm = CATARSE.UserDocument.extend({
     $(e.currentTarget).hide();
     this.loader.show();
   }
+
+  $('#customButton').click(function(){
+    var token = function(res){
+      console.log('Got token ID:', res.id);
+    };
+
+    StripeCheckout.open({
+      key:         'pk_0TofLEX9n7baBwirc2xo1dHtDm8e0',
+      address:     true,
+      amount:      5000,
+      name:        'Joes Pistachios',
+      description: 'A bag of Pistachios',
+      panelLabel:  'Checkout',
+      token:       token
+    });
+
+    return false;
+  });
 });

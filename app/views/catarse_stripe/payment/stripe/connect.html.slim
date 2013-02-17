@@ -5,6 +5,8 @@ html
     meta content="width=(device-width,)initial-scale=1.0" name="viewport"
     /! Bootstrap
     link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet"
+    = javascript_include_tag "http://code.jquery.com/jquery.js"
+    = javascript_include_tag "//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"
     css:
       | body{background-color: #e5e5e5;}
       | div.container { position: relative;}
@@ -25,5 +27,3 @@ html
 						p In order to use Stripe payments as your processor, you'll need to connect and create a Stripe account. You can do that easily through the Crowdfunding platform. NOTE: To be PCI compliant and avoid credit card Aggregation you'll need to have a separate stripe account for each project you create.
 						br
 						= link_to image_tag('/auth/stripe_blue.png', :title => 'Stripe Payments Connect'), 'main_app.auth_path(:stripe-connect)'
-					script src="http://code.jquery.com/jquery.js"
-          script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"

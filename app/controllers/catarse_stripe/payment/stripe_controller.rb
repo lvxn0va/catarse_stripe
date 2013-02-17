@@ -19,7 +19,7 @@ module CatarseStripe::Payment
 
     
     def connect
-      @user = current_user.find params[:id]
+      @user = current_user.find_by_id(params[:id])
 
       respond_to do |format|
         format.html

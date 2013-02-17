@@ -6,7 +6,7 @@ p You've chosen to contribute using a credit card. Stripe payments for customers
 
 #catarse_stripe_form
   = form_tag payment_pay_stripe_path(params[:id]) do
-    <button id="customButton">Pay</button>
+    /!<button id="customButton">Pay</button>
 
     javascript:
       $('#customButton').click(function(){
@@ -23,6 +23,8 @@ p You've chosen to contribute using a credit card. Stripe payments for customers
 
         return false;
       });
+
+    = submit_tag 'Pay', :id => "customButton", :class => "stripe-button"
 
 
 

@@ -1,6 +1,6 @@
 Rails.configuration.stripe = {
   :publishable_key => (::Configuration['stripe_api_key']),
-  :secret_key      => (::Configuration['stripe_secret_key'])
+  :secret_key      => (::Configuration['stripe_secret_key']),
   :stripe_client_id => (::Configuration['stripe_client_id'])
 }
 

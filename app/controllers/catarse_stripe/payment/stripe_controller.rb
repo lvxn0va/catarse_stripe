@@ -85,7 +85,7 @@ module CatarseStripe::Payment
           :payment_method => 'Stripe',
           :payment_token => response.customer, #Stripe Backer Customer_id
           :payment_id => response.id, #Stripe Backer Payment Id
-          :address_street => response.address,
+          :address_street => response.address_line1,
           :address_city => response.address_city,
           :address_state => response.address_state,
           :address_zip => response.address_zip,

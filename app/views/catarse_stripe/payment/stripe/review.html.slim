@@ -1,11 +1,12 @@
-/!= javascript_include_tag 'catarse_stripe'
 = javascript_include_tag "https://checkout.stripe.com/v2/checkout.js"
 = javascript_include_tag "https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"
 
-h3= t('projects.backers.review.international.section_title')
+h2 Crowdfunding Payments with Stripe
+p You've chosen to contribute using a credit card. Stripe payments for customers in US and Canada allow you to use your Visa, Mastercard or Amex. Credit Card information is not stored on the crowdfunding website, and is safely stored on Stripe's servers. For more info visit <a href="http://stripe.com"><b>STRIPE PAYMENTS</b></a>
+
 #catarse_stripe_form
   = form_tag payment_pay_stripe_path(params[:id]) do
-    <button id="customButton" class="stripe-button">Pay</button>
+    <button id="customButton">Pay</button>
 
     javascript:
       $('#customButton').click(function(){
@@ -22,13 +23,6 @@ h3= t('projects.backers.review.international.section_title')
 
         return false;
       });
-    /!.clearfix
-    /!.bootstrap-twitter
-      /!= label_tag 'user_document', t('projects.backers.review.international.user_document_label')
-      /!.clearfix
-      /!= text_field_tag 'user_document', nil, { autocomplete: 'off' }
-      /!.loader.hide= image_tag 'loading.gif'
-      /!= submit_tag t('projects.backers.review.international.button'), :class => 'btn btn-primary btn-large'
 
 
 

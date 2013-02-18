@@ -80,7 +80,7 @@ module CatarseStripe::Payment
     def pay
       backer = current_user.backs.find params[:id]
       
-      project = Project_find_by_id (params[:id])
+      project = Project.find_by_id (params[:id])
       access_token = project.stripe_key
       begin
         customer = Stripe::Customer.create(

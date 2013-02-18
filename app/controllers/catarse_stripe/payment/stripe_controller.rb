@@ -92,7 +92,7 @@ module CatarseStripe::Payment
           amount: backer.price_in_cents,
           currency: 'usd',
           description: t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value),
-          application_fee: (backer.price_cents * 0.07).to_money.to_s
+          application_fee: (backer.price_in_cents * 0.07).to_money.to_s
           },
           access_token #ACCESS_TOKEN (Stripe Secret Key of Connected Project Owner NOT platform)
         )

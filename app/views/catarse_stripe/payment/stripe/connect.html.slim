@@ -26,4 +26,4 @@ html
 						h2 Stripe Connect
 						p In order to use Stripe payments as your processor, you'll need to connect and create a Stripe account. You can do that easily through the Crowdfunding platform. NOTE: To be PCI compliant and avoid credit card Aggregation you'll need to have a separate stripe account for each project you create.
 						br
-						= link_to(image_tag('/assets/auth/stripe_blue.png'), main_app.connect_path(:stripe_connect))
+						= link_to(image_tag('/assets/auth/stripe_blue.png'), main_app.auth_path(:stripe_connect))

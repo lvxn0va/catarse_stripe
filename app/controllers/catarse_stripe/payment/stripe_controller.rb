@@ -37,15 +37,6 @@ module CatarseStripe::Payment
     
     end
 
-    def charge
-      backer = current_user.backs.find params[:id]
-
-      respond_to do |format|
-        format.html
-        format.js
-      end
-    end 
-
     def ipn
       backer = Backer.where(:payment_id => details.id).first
       if backer
@@ -77,11 +68,20 @@ module CatarseStripe::Payment
       render status: 404, nothing: true
     end
 
+    def charge
+      backer = current_user.backs.find params[:id]
+
+      respond_to do |format|
+        format.html
+        format.js
+      end
+    end 
+
     def pay
       backer = current_user.backs.find params[:id]
       
-      project_owner = project.user_id
-      access_token = project_owner.stripe_access_token
+      project = Project_find_by_id (params[:id])
+      access_token = project.stripe_key
       begin
         customer = Stripe::Customer.create(
           email: backer.payer_email,

@@ -79,6 +79,9 @@ module CatarseStripe::Payment
 
     def pay
       backer = current_user.backs.find params[:id]
+      
+      project_owner = project.user_id
+      access_token = project_owner.stripe_access_token
       begin
         customer = Stripe::Customer.create(
           email: backer.payer_email,
@@ -86,10 +89,14 @@ module CatarseStripe::Payment
         )
 
         response = Stripe::Charge.create(
+          {
           customer: customer.id,
           amount: backer.price_in_cents,
           currency: 'usd',
           description: t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value)
+          application_fee: (backer.price_cents * 0.07).to_money.to_s
+          }
+          access_token
         )
 
         backer.update_attributes({

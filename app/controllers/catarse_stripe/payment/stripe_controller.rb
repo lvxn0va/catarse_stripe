@@ -5,8 +5,8 @@ module CatarseStripe::Payment
     class StripeController < ApplicationController
     
     skip_before_filter :verify_authenticity_token, :only => [:notifications]
-    skip_before_filter :detect_locale, :only => [:notifications]
-    skip_before_filter :set_locale, :only => [:notifications]
+    skip_before_filter :detect_locale, :only => [:notifications, :connect]
+    skip_before_filter :set_locale, :only => [:notifications, :connect]
     skip_before_filter :force_http
 
     #Disable ActiveMerchant::Stripe in favor of Stripe gem
@@ -20,7 +20,7 @@ module CatarseStripe::Payment
     
     def connect
       @user = current_user
-      
+
       respond_to do |format|
         format.html
         format.js

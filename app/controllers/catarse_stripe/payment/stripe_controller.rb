@@ -1,5 +1,6 @@
 require 'catarse_stripe/processors'
 require 'json'
+require 'stripe'
 
 module CatarseStripe::Payment
     class StripeController < ApplicationController

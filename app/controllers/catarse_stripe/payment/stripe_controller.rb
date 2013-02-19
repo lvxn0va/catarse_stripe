@@ -81,15 +81,20 @@ module CatarseStripe::Payment
       backer = current_user.backs.find params[:id]
       access_token = backer.project.stripe_key
       begin
+
         customer = Stripe::Customer.create(
           email: backer.payer_email,
           card: params[:stripeToken]
         )
+        
+        backer.update_attribute(payment_token: customer.id)
+        backer.save!
+        flash[:notice] = "Stripe Customer ID Saved!"
 
         response = Stripe::Charge.create(
           {
-          card: customer.card,
-          #customer: customer.id,
+          #card: token,
+          customer: backer.payment_token,
           amount: backer.price_in_cents,
           currency: 'usd',
           description: t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value),

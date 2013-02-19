@@ -69,7 +69,8 @@ module CatarseStripe::Payment
     end
 
     def charge
-      @backer = current_user.backs.find params[:id]
+      backer = current_user.backs.find params[:id]
+      @access_token = backer.project.stripe_key
 
       respond_to do |format|
         format.html

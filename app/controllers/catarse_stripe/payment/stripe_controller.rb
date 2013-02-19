@@ -70,8 +70,8 @@ module CatarseStripe::Payment
     end
 
     def charge
-      backer = current_user.backs.find params[:id]
-      access_token = backer.project.stripe_access_token #Project Owner SECRET KEY
+      @backer = current_user.backs.find params[:id]
+      access_token = @backer.project.stripe_access_token #Project Owner SECRET KEY
 
       respond_to do |format|
         format.html
@@ -80,46 +80,46 @@ module CatarseStripe::Payment
     end 
 
     def pay
-      backer = current_user.backs.find params[:id]
-      access_token = backer.project.stripe_access_token #Project Owner SECRET KEY
+      @backer = current_user.backs.find params[:id]
+      access_token = @backer.project.stripe_access_token #Project Owner SECRET KEY
       begin
         customer = Stripe::Customer.create(
            email: backer.payer_email,
            card: params[:stripeToken]
         )
         
-        backer.update_attributes(:payment_token => customer.id)
-        backer.save
+        @backer.update_attributes(:payment_token => customer.id)
+        @backer.save
         flash[:notice] = "Stripe Customer ID Saved!"
 
         response = Stripe::Charge.create(
           {
           #card: token,
-          customer: backer.payment_token,
-          amount: backer.price_in_cents,
+          customer: @backer.payment_token,
+          amount: @backer.price_in_cents,
           currency: 'usd',
-          description: t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value),
-          application_fee: backer.platform_fee.to_i
+          description: t('stripe_description', scope: SCOPE, :project_name => @backer.project.name, :value => @backer.display_value),
+          application_fee: @backer.platform_fee.to_i
           },
           access_token #ACCESS_TOKEN (Stripe Secret Key of Connected Project Owner NOT platform)
         )
 
-        backer.update_attributes({
+        @backer.update_attributes({
           :payment_method => 'Stripe',
           :payment_token => response.customer, #Stripe Backer Customer_id
           :payment_id => response.id, #Stripe Backer Payment Id
           :confirmed => response.paid #Paid = True, Confirmed =  true
         })
-        backer.save
+        @backer.save
 
         build_notification(backer, response)
       
-        redirect_to payment_success_stripe_url(id: backer.id)
+        redirect_to payment_success_stripe_url(id: @backer.id)
       rescue Stripe::CardError => e
         ::Airbrake.notify({ :error_class => "Stripe #Pay Error", :error_message => "Stripe #Pay Error: #{e.inspect}", :parameters => params}) rescue nil
         Rails.logger.info "-----> #{e.inspect}"
         flash[:error] = e.message
-        return redirect_to main_app.new_project_backer_path(backer.project)
+        return redirect_to main_app.new_project_backer_path(@backer.project)
       end
     end
 

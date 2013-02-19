@@ -87,7 +87,7 @@ module CatarseStripe::Payment
           card: params[:stripeToken]
         )
         
-        backer.update_attribute(payment_token: customer.id)
+        backer.update_attributes(:payment_token => customer.id)
         backer.save!
         flash[:notice] = "Stripe Customer ID Saved!"
 

@@ -71,7 +71,7 @@ module CatarseStripe::Payment
 
     def charge
       backer = current_user.backs.find params[:id]
-      @access_token = backer.project.stripe_key
+      access_token = backer.project.stripe_access_token #Project Owner SECRET KEY
 
       respond_to do |format|
         format.html
@@ -81,7 +81,7 @@ module CatarseStripe::Payment
 
     def pay
       backer = current_user.backs.find params[:id]
-      access_token = backer.project.stripe_key
+      access_token = backer.project.stripe_access_token #Project Owner SECRET KEY
       begin
         customer = Stripe::Customer.create(
           {email: backer.payer_email},

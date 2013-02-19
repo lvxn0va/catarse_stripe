@@ -84,12 +84,14 @@ module CatarseStripe::Payment
       access_token = backer.project.stripe_access_token #Project Owner SECRET KEY
       begin
         customer = Stripe::Customer.create(
-          {email: backer.payer_email},
+          {email: backer.payer_email
+           card: params[:stripeToken]
+            },
           access_token
         )
         
         backer.update_attributes(:payment_token => customer.id)
-        backer.save!
+        backer.save
         flash[:notice] = "Stripe Customer ID Saved!"
 
         response = Stripe::Charge.create(

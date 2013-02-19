@@ -88,7 +88,7 @@ module CatarseStripe::Payment
 
         response = Stripe::Charge.create(
           {
-          customer: customer.id,
+          #customer: customer.id,
           amount: backer.price_in_cents,
           currency: 'usd',
           description: t('stripe_description', scope: SCOPE, :project_name => backer.project.name, :value => backer.display_value),

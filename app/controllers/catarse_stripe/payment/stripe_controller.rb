@@ -37,7 +37,7 @@ module CatarseStripe::Payment
     def callback
       @user = current_user
       
-      response = STRIPE_OAUTH.auth_code.get_token(code, {
+      response = @client.auth_code.get_token(code, {
       :headers => {'Authorization' => "Bearer #{(::Configuration['stripe_secret_key'])}"} #Platform Secret Key
       })
       @user.stripe_access_token = response.params['access_token']

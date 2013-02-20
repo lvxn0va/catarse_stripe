@@ -2,7 +2,7 @@ CatarseStripe::Engine.routes.draw do
   namespace :payment do
     get '/stripe/:id/review' => 'stripe#review', :as => 'review_stripe'
     post '/stripe/notifications' => 'stripe#ipn',  :as => 'ipn_stripe'
-    match '/stripe/callback'          => 'stripe#callback',       :as => 'stripe_auth_callback', :method => [:get, :post]
+    match '/stripe/callback'          => 'stripe#callback',       :as => 'stripe_auth_callback', :method => [:post]
     match '/stripe/:id/notifications' => 'stripe#notifications',  :as => 'notifications_stripe'
     match '/stripe/:id/pay'           => 'stripe#pay',            :as => 'pay_stripe'
     match '/stripe/:id/success'       => 'stripe#success',        :as => 'success_stripe'

@@ -45,9 +45,9 @@ In Rails console, run this:
     
 If you've already created your application and been approved at Stripe.com add your Client_id  
 
-    Configuration.create!(name: "stripe_client_id", value: "STRIPE_CLIENT_ID")
+    Configuration.create!(name: "stripe_client_id", value: "STRIPE_CLIENT_ID")  
 
-    NOTE: Be sure to add the correct keys from the API section of your Stripe account settings. Stripe_Test: TRUE = Using Stripe Test Server/Sandbox Mode / FALSE = Using Stripe live server.  
+NOTE: Be sure to add the correct keys from the API section of your Stripe account settings. Stripe_Test: TRUE = Using Stripe Test Server/Sandbox Mode / FALSE = Using Stripe live server.  
 
 ## Development environment setup
 

@@ -128,9 +128,13 @@ module CatarseStripe::Payment
 
     def success
       backer = current_user.backs.find params[:id]
+      access_token = @backer.project.stripe_access_token #Project Owner SECRET KEY
       begin
         details = Stripe::Charge.retrieve(
+        {
           id: backer.payment_id
+          },
+          access_token
           )
 
         build_notification(backer, details)

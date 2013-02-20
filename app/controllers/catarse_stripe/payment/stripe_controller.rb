@@ -1,6 +1,7 @@
 require 'catarse_stripe/processors'
 require 'json'
 require 'stripe'
+require 'oauth2'
 
 module CatarseStripe::Payment
     class StripeController < ApplicationController
@@ -181,7 +182,7 @@ module CatarseStripe::Payment
     end
 
     def setup_auth_gateway
-      STRIPE_OAUTH = OAuth2::Client.new(::Configuration['stripe_client_id']), '', {
+      STRIPE_OAUTH = OAuth2::Client.new((::Configuration['stripe_client_id']), '', {
         :site => 'https://connect.stripe.com',
         :authorize_url => '/oauth/authorize',
         :token_url => '/oauth/token'

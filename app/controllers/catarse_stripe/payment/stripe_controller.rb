@@ -11,7 +11,7 @@ module CatarseStripe::Payment
     skip_before_filter :set_locale, :only => [:notifications, :connect]
     skip_before_filter :force_http
 
-    before_filter :setup_auth_gateway, :only => [:auth]
+    #before_filter :setup_auth_gateway
 
     SCOPE = "projects.backers.checkout"
     SCOPE = "users.projects"
@@ -20,7 +20,12 @@ module CatarseStripe::Payment
 
     #TODO add auth code - replace omniauth
     def auth
-      @user = current_user
+      #@user = current_user
+      STRIPE_OAUTH = OAuth2::Client.new('ca_1FKABuNtvsrKB1mWUgv7ICkDdchk0Sgf', 'h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V', {
+        :site => 'https://connect.stripe.com',
+        :authorize_url => '/oauth/authorize',
+        :token_url => '/oauth/token'
+      })
     
       respond_to do |format|
         format.html

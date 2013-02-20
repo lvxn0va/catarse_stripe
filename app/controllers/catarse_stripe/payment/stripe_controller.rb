@@ -21,7 +21,7 @@ module CatarseStripe::Payment
     #TODO add auth code - replace omniauth
     def auth
       #@user = current_user
-      OAuth2::Client.new('ca_1FKABuNtvsrKB1mWUgv7ICkDdchk0Sgf', 'h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V', {
+      client = OAuth2::Client.new('ca_1FKABuNtvsrKB1mWUgv7ICkDdchk0Sgf', 'h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V', {
         :site => 'https://connect.stripe.com',
         :authorize_url => '/oauth/authorize',
         :token_url => '/oauth/token'
@@ -187,7 +187,7 @@ module CatarseStripe::Payment
     end
 
     def setup_auth_gateway
-      OAuth2::Client.new('ca_1FKABuNtvsrKB1mWUgv7ICkDdchk0Sgf', 'h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V', {
+      client = OAuth2::Client.new('ca_1FKABuNtvsrKB1mWUgv7ICkDdchk0Sgf', 'h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V', {
         :site => 'https://connect.stripe.com',
         :authorize_url => '/oauth/authorize',
         :token_url => '/oauth/token'

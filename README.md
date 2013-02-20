@@ -54,6 +54,8 @@ NOTE: Be sure to add the correct keys from the API section of your Stripe accoun
 Users who will be creating projects can now create and connect a Stripe.com project payments account. This is the account that will receive funds for each project.  
 
 Just above the #password field and in the My_Data section, add the following in `app/views/users/_current_user_fields.html.slim`:  
+    
+    ...
     #payment_gateways
     h1= t('.payment_gateways')
     ul
@@ -68,6 +70,7 @@ Just above the #password field and in the My_Data section, add the following in 
           br
           p= t('.stripe_customer_info')
           p= @user.stripe_userid
+          ...
 
 This will create a button in the User/settings tab to connect to the catarse_stripe auth and get a UserID, Secretkey and PublicKey for the User/Project Owner. To copy those keys to the matchin columns in the projects table.  
 

@@ -11,7 +11,7 @@ module CatarseStripe::Payment
     skip_before_filter :set_locale, :only => [:notifications, :connect]
     skip_before_filter :force_http
 
-    #before_filter :setup_auth_gateway
+    before_filter :setup_auth_gateway
 
     SCOPE = "projects.backers.checkout"
     SCOPE = "users.projects"
@@ -21,11 +21,11 @@ module CatarseStripe::Payment
     #TODO add auth code - replace omniauth
     def auth
       #@user = current_user
-      @client = OAuth2::Client.new('ca_1FKABuNtvsrKB1mWUgv7ICkDdchk0Sgf', 'h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V', {
-        :site => 'https://connect.stripe.com',
-        :authorize_url => '/oauth/authorize',
-        :token_url => '/oauth/token'
-      })
+      #@client = OAuth2::Client.new('ca_1FKABuNtvsrKB1mWUgv7ICkDdchk0Sgf', 'h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V', {
+       # :site => 'https://connect.stripe.com',
+       # :authorize_url => '/oauth/authorize',
+       # :token_url => '/oauth/token'
+      #})
     
       respond_to do |format|
         format.html
@@ -35,7 +35,7 @@ module CatarseStripe::Payment
 
     #TODO add auth code - replace omniauth
     def callback
-      @user = current_user
+      code = params[:code]
       
       response = @client.auth_code.get_token(code, {
       :headers => {'Authorization' => "Bearer #{(::Configuration['stripe_secret_key'])}"} #Platform Secret Key
@@ -172,6 +172,13 @@ module CatarseStripe::Payment
     end
 
   private
+    def setup_auth_gateway
+      @client = OAuth2::Client.new((::Configuration['stripe_client_id']), (::Configuration['stripe_access_token']), {
+        :site => 'https://connect.stripe.com',
+        :authorize_url => '/oauth/authorize',
+        :token_url => '/oauth/token'
+      })
+    end
 
     def build_notification(backer, data)
       processor = CatarseStripe::Processors::Stripe.new

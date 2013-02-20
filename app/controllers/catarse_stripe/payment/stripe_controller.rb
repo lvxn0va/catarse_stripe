@@ -20,6 +20,7 @@ module CatarseStripe::Payment
 
     #Makes the call to @client.auth_code.authorize_url from auth.html.erg
     def auth
+      @user = current_user
       respond_to do |format|
         format.html
         format.js

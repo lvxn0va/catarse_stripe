@@ -29,7 +29,7 @@
                     <p> If you don't have a Stripe account, you'll be prompted to create one</p>
                     <p class="stripe-connect-btn">
                         <a href="<%= @client.auth_code.authorize_url(:scope => 'read_write') %>">
-                            <img src="/assets/auth/stripe_blue.png" width="190" height="33" data-hires="true">
+                            <img src="/assets/auth/stripe_blue.png">
                         </a>
                     </p>
 				</stripe-field>

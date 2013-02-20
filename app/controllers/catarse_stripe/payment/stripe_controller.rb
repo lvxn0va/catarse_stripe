@@ -18,22 +18,15 @@ module CatarseStripe::Payment
 
     layout :false
 
-    #TODO add auth code - replace omniauth
+    #Makes the call to @client.auth_code.authorize_url from auth.html.erg
     def auth
-      #@user = current_user
-      #@client = OAuth2::Client.new('ca_1FKABuNtvsrKB1mWUgv7ICkDdchk0Sgf', 'h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V', {
-       # :site => 'https://connect.stripe.com',
-       # :authorize_url => '/oauth/authorize',
-       # :token_url => '/oauth/token'
-      #})
-    
       respond_to do |format|
         format.html
         format.js
       end
     end
 
-    #TODO add auth code - replace omniauth
+    #Brings back the authcode from Stripe and makes another call to Stripe to convert to a authtoken
     def callback
       code = params[:code]
       @user = current_user
@@ -41,13 +34,14 @@ module CatarseStripe::Payment
       response = @client.auth_code.get_token(code, {
       :headers => {'Authorization' => "Bearer #{(::Configuration['stripe_secret_key'])}"} #Platform Secret Key
       })
+      #Save the User's attached access_token and Stripe acct info
       @user.stripe_access_token = response.token
       @user.stripe_key = response.params['stripe_publishable_key']
       @user.stripe_userid = response.params['stripe_user_id']
       @user.save
 
 
-      return redirect_to(user_path(@user.primary)) if @user.primary
+      redirect_to(main_app.user_path(@user.primary)) if @user.primary
     end
 
     def review
@@ -84,7 +78,7 @@ module CatarseStripe::Payment
       ::Airbrake.notify({ :error_class => "Stripe Notification Error", :error_message => "Stripe Notification Error: #{e.inspect}", :parameters => params}) rescue nil
       render status: 404, nothing: true
     end
-
+    
     def charge
       @backer = current_user.backs.find params[:id]
       access_token = @backer.project.stripe_access_token #Project Owner SECRET KEY

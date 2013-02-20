@@ -72,9 +72,9 @@ Just above the #password field and in the My_Data section, add the following in 
           p= @user.stripe_userid
           ...
 
-This will create a button in the User/settings tab to connect to the catarse_stripe auth and get a UserID, Secretkey and PublicKey for the User/Project Owner. To copy those keys to the matchin columns in the projects table.  
+This will create a button in the User/settings tab to connect to the catarse_stripe auth and get a UserID, Secretkey and PublicKey for the User/Project Owner. 
 
-Add this to the bottom of app/controllers/projects_controller.rb:
+You'll then need to copy those keys to the matchin columns in the projects table.  You can do this automatically when a created project is loaded by adding this to the bottom of app/controllers/projects_controller.rb:  
 
     def check_for_stripe_keys
       if @project.stripe_userid.nil?

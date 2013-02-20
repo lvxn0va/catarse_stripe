@@ -115,7 +115,7 @@ module CatarseStripe::Payment
         })
         @backer.save
 
-        build_notification(backer, response)
+        build_notification(@backer, response)
       
         redirect_to payment_success_stripe_url(id: @backer.id)
       rescue Stripe::CardError => e

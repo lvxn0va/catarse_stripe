@@ -40,7 +40,7 @@ module CatarseStripe::Payment
       response = @client.auth_code.get_token(code, {
       :headers => {'Authorization' => "Bearer #{(::Configuration['stripe_secret_key'])}"} #Platform Secret Key
       })
-      @user.stripe_access_token = response.access_token
+      @user.stripe_access_token = response.token
       @user.stripe_key = response.stripe_publishable_key
       @user.stripe_userid = response.stripe_user_id
 

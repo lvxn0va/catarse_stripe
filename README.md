@@ -1,9 +1,11 @@
 ## The stripe_controller is a work in progress and things will be changing very rapidly. BEWARE!
-### Tests are non-funtional at this point and will be adjusted to Stripe soon!
+### Tests are non-functional at this point and will be adjusted to Stripe soon!
 
 # CatarseStripe
 
-Catarse Stripe integration with [Catarse](http://github.com/danielweinmann/catarse) crowdfunding platform
+Catarse Stripe integration with [Catarse](http://github.com/danielweinmann/catarse) crowdfunding platform. 
+
+So far, catarse_stripe uses Omniauth for an auth connection and to use Catarse as a Platform app. See the wiki on how to use Stripe-Connect.
 
 ## Installation
 
@@ -16,6 +18,11 @@ And then execute:
 
     $ bundle
 
+Install the database migrations
+
+    bundle exec rake catarse_stripe:install:migrations
+    bundle exec rake db:migrate
+    
 ## Usage
 
 Configure the routes for your Catarse application. Add the following lines in the routes file (config/routes.rb):

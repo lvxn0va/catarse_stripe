@@ -36,6 +36,7 @@ module CatarseStripe::Payment
     #TODO add auth code - replace omniauth
     def callback
       code = params[:code]
+      @user = current_user
       
       response = @client.auth_code.get_token(code, {
       :headers => {'Authorization' => "Bearer #{(::Configuration['stripe_secret_key'])}"} #Platform Secret Key

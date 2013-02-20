@@ -169,6 +169,7 @@ module CatarseStripe::Payment
     end
 
   private
+    #Setup the Oauth2 Stripe call with needed params - See initializers.stripe..rb..the Stripe keys are setup in the seed.db or added manually with a Configuration.create! call.
     def setup_auth_gateway
       @client = OAuth2::Client.new((::Configuration['stripe_client_id']), (::Configuration['stripe_access_token']), {
         :site => 'https://connect.stripe.com',

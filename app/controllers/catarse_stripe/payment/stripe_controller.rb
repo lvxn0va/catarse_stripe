@@ -10,27 +10,36 @@ module CatarseStripe::Payment
     skip_before_filter :set_locale, :only => [:notifications, :connect]
     skip_before_filter :force_http
 
+    before_filter :setup_auth_gateway, :only => [:auth]
+
     SCOPE = "projects.backers.checkout"
     SCOPE = "users.projects"
 
     layout :false
 
     #TODO add auth code - replace omniauth
-    def connect
+    def auth
       @user = current_user
-
+    
       respond_to do |format|
         format.html
         format.js
       end
     end
-    
+
     #TODO add auth code - replace omniauth
-    #def auth
-      #if @user.stripe_key.present?
-        #render :text => "You have already connected a Stripe account. Your Stripe Key is #{@user.stripe_key}."
-      #end
-    #end
+    def callback
+      @user = current_user
+      
+      response = STRIPE_OAUTH.auth_code.get_token(code, {
+      :headers => {'Authorization' => "Bearer #{(::Configuration['stripe_secret_key'])}"} #Platform Secret Key
+      })
+      @user.stripe_access_token = response.params['access_token']
+      @user.stripe_key = response.params['stripe_publishable_key']
+      @user.stripe_userid = response.params['stripe_user_id']
+
+      return redirect_to(user_path(@user.primary)) if @user.primary
+    end
 
     def review
     
@@ -171,14 +180,14 @@ module CatarseStripe::Payment
       flash[:success] = t('success', scope: SCOPE)
     end
 
-    def setup_gateway
-      if ::Configuration[:stripe_api_key]# and ::Configuration[:stripe_secret_key]
-        @@gateway ||= ActiveMerchant::Billing::StripeGateway.new({
-          :login => ::Configuration[:stripe_api_key]
-          #:login => ::Configuration[:stripe_secret_key]
-        })
+    def setup_auth_gateway
+      STRIPE_OAUTH = OAuth2::Client.new(::Configuration['stripe_client_id']), '', {
+        :site => 'https://connect.stripe.com',
+        :authorize_url => '/oauth/authorize',
+        :token_url => '/oauth/token'
+      })
       else
-        puts "[Stripe] API key is required to make requests to Stripe"
+        puts "[Stripe] ClientId key is required to make requests to Stripe"
       end
     end
   end

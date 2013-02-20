@@ -7,6 +7,7 @@ CatarseStripe::Engine.routes.draw do
     match '/stripe/:id/success'       => 'stripe#success',        :as => 'success_stripe'
     match '/stripe/:id/cancel'        => 'stripe#cancel',         :as => 'cancel_stripe'
     match '/stripe/:id/charge'        => 'stripe#charge',         :as => 'charge_stripe'
-    match '/stripe/connect'        		=> 'stripe#connect',        :as => 'connect_stripe'
+    match '/stripe/auth'              => 'stripe#auth',           :as => 'stripe_auth'
+    match '/stripe/callback'          => 'stripe#callback',       :as => 'stripe_auth_callback'
   end
 end

@@ -2,12 +2,13 @@
 
 require 'spec_helper'
 
-describe CatarsePaypalExpress::Payment::PaypalExpressController do
+#TODO
+describe CatarseStripe::Payment::StripeController do
   before do
-    Configuration.create!(name: "paypal_username", value: "usertest_api1.teste.com")
-    Configuration.create!(name: "paypal_password", value: "HVN4PQBGZMHKFVGW")
-    Configuration.create!(name: "paypal_signature", value: "AeL-u-Ox.N6Jennvu1G3BcdiTJxQAWdQcjdpLTB9ZaP0-Xuf-U0EQtnS")
-    ActiveMerchant::Billing::PaypalExpressGateway.any_instance.stub(:details_for).and_return({})
+    #Configuration.create!(name: "paypal_username", value: "usertest_api1.teste.com")
+    #Configuration.create!(name: "paypal_password", value: "HVN4PQBGZMHKFVGW")
+    #Configuration.create!(name: "paypal_signature", value: "AeL-u-Ox.N6Jennvu1G3BcdiTJxQAWdQcjdpLTB9ZaP0-Xuf-U0EQtnS")
+    #ActiveMerchant::Billing::PaypalExpressGateway.any_instance.stub(:details_for).and_return({})
     Airbrake.stub(:notify).and_return({})
   end
 
@@ -20,7 +21,7 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
     let(:backer){ Factory(:backer, :payment_id => ipn_data['txn_id'] ) }
     before do
       backer
-      post :ipn, ipn_data.merge({ use_route: 'catarse_paypal_express' })
+      post :ipn, ipn_data.merge({ use_route: 'catarse_stripe' })
       backer.reload
     end
 
@@ -42,13 +43,13 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
   describe "POST notification" do
     context 'when receive a notification' do
       it 'and not found the backer, should return 404' do
-        post :notifications, { id: 1, use_route: 'catarse_paypal_express'}
+        post :notifications, { id: 1, use_route: 'catarse_stripe'}
         response.status.should eq(404)
       end
 
       it 'and the transaction ID not match, should return 404' do
         backer = Factory(:backer, payment_id: '1234')
-        post :notifications, { id: backer.id, txn_id: 123, use_route: 'catarse_paypal_express' }
+        post :notifications, { id: backer.id, txn_id: 123, use_route: 'catarse_stripe' }
         response.status.should eq(404)
       end
 
@@ -56,12 +57,12 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
         success_payment_response = mock()
         success_payment_response.stubs(:params).returns({ 'transaction_id' => '1234', "checkout_status" => "PaymentActionCompleted" })
         success_payment_response.stubs(:success?).returns(true)
-        ActiveMerchant::Billing::PaypalExpressGateway.any_instance.stub(:details_for).and_return(success_payment_response)
+        ActiveMerchant::Billing::StripeGateway.any_instance.stub(:details_for).and_return(success_payment_response)
 
         backer = Factory(:backer, payment_id: '1234')
         backer.payment_notifications.should be_empty
 
-        post :notifications, { id: backer.id, txn_id: 1234 , use_route: 'catarse_paypal_express' }
+        post :notifications, { id: backer.id, txn_id: 1234 , use_route: 'catarse_stripe' }
         backer.reload
 
         backer.payment_notifications.should_not be_empty
@@ -71,10 +72,10 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
         success_payment_response = mock()
         success_payment_response.stubs(:params).returns({ 'transaction_id' => '1234', "checkout_status" => "PaymentActionCompleted" })
         success_payment_response.stubs(:success?).returns(true)
-        ActiveMerchant::Billing::PaypalExpressGateway.any_instance.stub(:details_for).and_return(success_payment_response)
+        ActiveMerchant::Billing::StripeGateway.any_instance.stub(:details_for).and_return(success_payment_response)
         backer = Factory(:backer, payment_id: '1234', confirmed: false)
 
-        post :notifications, { id: backer.id, txn_id: 1234, use_route: 'catarse_paypal_express' }
+        post :notifications, { id: backer.id, txn_id: 1234, use_route: 'catarse_stripe' }
 
         backer.reload
         response.status.should eq(200)
@@ -88,7 +89,7 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
       context 'when have some failures' do
         it 'user not logged in, should redirect' do
           pending 'problems with external application routes'
-          #get :pay, {locale: 'en', use_route: 'catarse_paypal_express' }
+          #get :pay, {locale: 'en', use_route: 'catarse_stripe' }
           #response.status.should eq(302)
         end
 
@@ -97,17 +98,17 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
           session[:user_id] = current_user.id
 
           lambda { 
-            get :pay, { id: backer.id, locale: 'en', use_route: 'catarse_paypal_express' }
+            get :pay, { id: backer.id, locale: 'en', use_route: 'catarse_stripe' }
           }.should raise_exception ActiveRecord::RecordNotFound
         end
 
         it 'raise a exepction because invalid data and should be redirect and set the flash message' do
-          ActiveMerchant::Billing::PaypalExpressGateway.any_instance.stub(:setup_purchase).and_raise(StandardError)
+          ActiveMerchant::Billing::StripeGateway.any_instance.stub(:setup_purchase).and_raise(StandardError)
           session[:user_id] = current_user.id
           backer = Factory(:backer, user: current_user)
 
-          get :pay, { id: backer.id, locale: 'en', use_route: 'catarse_paypal_express' }
-          flash[:failure].should == I18n.t('paypal_error', scope: CatarsePaypalExpress::Payment::PaypalExpressController::SCOPE)
+          get :pay, { id: backer.id, locale: 'en', use_route: 'catarse_stripe' }
+          flash[:failure].should == I18n.t('stripe_error', scope: CatarseStripe::Payment::StripeController::SCOPE)
           response.should be_redirect
         end
       end
@@ -117,14 +118,14 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
           success_response = mock()
           success_response.stub(:token).and_return('ABCD')
           success_response.stub(:params).and_return({ 'correlation_id' => '123' })
-          ActiveMerchant::Billing::PaypalExpressGateway.any_instance.stub(:setup_purchase).and_return(success_response)
+          ActiveMerchant::Billing::StripeGateway.any_instance.stub(:setup_purchase).and_return(success_response)
         end
 
         it 'should create a payment_notification' do
           session[:user_id] = current_user.id
           backer = Factory(:backer, user: current_user)
 
-          get :pay, { id: backer.id, locale: 'en', use_route: 'catarse_paypal_express' }
+          get :pay, { id: backer.id, locale: 'en', use_route: 'catarse_stripe' }
           backer.reload
 
           backer.payment_notifications.should_not be_empty
@@ -134,10 +135,10 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
           session[:user_id] = current_user.id
           backer = Factory(:backer, user: current_user)
 
-          get :pay, { id: backer.id, locale: 'en', use_route: 'catarse_paypal_express' }
+          get :pay, { id: backer.id, locale: 'en', use_route: 'catarse_stripe' }
           backer.reload
 
-          backer.payment_method.should == 'PayPal'
+          backer.payment_method.should == 'Stripe'
           backer.payment_token.should == 'ABCD'
 
           # The correlation id should not be stored in payment_id, which is only for transaction_id
@@ -150,13 +151,13 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
   end
 
   describe "GET cancel" do
-    context 'when cancel the paypal purchase' do
+    context 'when cancel the stripe purchase' do
       it 'should show for user the flash message' do
         session[:user_id] = current_user.id
         backer = Factory(:backer, user: current_user, payment_token: 'TOKEN')
 
-        get :cancel, { id: backer.id, locale: 'en', use_route: 'catarse_paypal_express' }
-        flash[:failure].should == I18n.t('paypal_cancel', scope: CatarsePaypalExpress::Payment::PaypalExpressController::SCOPE)
+        get :cancel, { id: backer.id, locale: 'en', use_route: 'catarse_stripe' }
+        flash[:failure].should == I18n.t('stripe_cancel', scope: CatarseStripe::Payment::StripeController::SCOPE)
         response.should be_redirect
       end
     end
@@ -170,18 +171,18 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
       fake_success_details
     end
 
-    context 'paypal returning to success route' do
+    context 'stripe returning to success route' do
 
-      context 'when paypal purchase is ok' do
+      context 'when stripe purchase is ok' do
         before(:each) do
-          ActiveMerchant::Billing::PaypalExpressGateway.any_instance.stub(:details_for) do
+          ActiveMerchant::Billing::StripeGateway.any_instance.stub(:details_for) do
             # If we call the details_for before purchase the transaction_id will not be present
             success_details.delete('transaction_id') unless success_details['transaction_id'] == '12345'
             fake_success_details
           end
           fake_success_purchase = mock()
           fake_success_purchase.stub(:success?).and_return(true)
-          ActiveMerchant::Billing::PaypalExpressGateway.any_instance.stub(:purchase) do
+          ActiveMerchant::Billing::StripeGateway.any_instance.stub(:purchase) do
             # only after the purchase command the transactio_id is set in the details_for
             success_details['transaction_id'] = '12345' if success_details.include?('transaction_id')
             fake_success_purchase
@@ -193,7 +194,7 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
           backer = Factory(:backer, user: current_user, payment_token: 'TOKEN')
           backer.payment_notifications.should be_empty
 
-          get :success, { id: backer.id, PayerID: '123', locale: 'en', use_route: 'catarse_paypal_express' }
+          get :success, { id: backer.id, PayerID: '123', locale: 'en', use_route: 'catarse_stripe' }
           backer.reload
 
           backer.payment_notifications.should_not be_empty
@@ -203,18 +204,18 @@ describe CatarsePaypalExpress::Payment::PaypalExpressController do
         end
       end
 
-      context 'when paypal purchase raise a error' do
+      context 'when stripe purchase raise a error' do
         before do
-          ActiveMerchant::Billing::PaypalExpressGateway.any_instance.stub(:purchase).and_raise(StandardError)
+          ActiveMerchant::Billing::StripeGateway.any_instance.stub(:purchase).and_raise(StandardError)
         end
 
         it 'should be redirect and show a flash message' do
           session[:user_id] = current_user.id
           backer = Factory(:backer, user: current_user)
 
-          get :success, { id: backer.id, PayerID: '123', locale: 'en', use_route: 'catarse_paypal_express' }
+          get :success, { id: backer.id, PayerID: '123', locale: 'en', use_route: 'catarse_stripe' }
 
-          flash[:failure].should == I18n.t('paypal_error', scope: CatarsePaypalExpress::Payment::PaypalExpressController::SCOPE)
+          flash[:failure].should == I18n.t('stripe_error', scope: CatarseStripe::Payment::StripeController::SCOPE)
           response.should be_redirect
         end
       end

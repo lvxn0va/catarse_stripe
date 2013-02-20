@@ -10,15 +10,12 @@ module CatarseStripe::Payment
     skip_before_filter :set_locale, :only => [:notifications, :connect]
     skip_before_filter :force_http
 
-    #Disable ActiveMerchant::Stripe in favor of Stripe gem
-    #before_filter :setup_gateway
-
     SCOPE = "projects.backers.checkout"
     SCOPE = "users.projects"
 
     layout :false
 
-    
+    #TODO add auth code - replace omniauth
     def connect
       @user = current_user
 
@@ -27,7 +24,8 @@ module CatarseStripe::Payment
         format.js
       end
     end
-
+    
+    #TODO add auth code - replace omniauth
     #def auth
       #if @user.stripe_key.present?
         #render :text => "You have already connected a Stripe account. Your Stripe Key is #{@user.stripe_key}."

@@ -12,3 +12,7 @@ en:
         stripe_description: "Back project %{project_name} with %{value} (USD)"
         stripe_error: "Ooops. There was an error while sending your payment to Stripe. Please try again."
         success: "Your back was successfully made. Thanks a lot!"
+  users:
+    auth:
+      stripe_error: "Ooops. There was an error while authorizing your user to Stripe. Please try again."
+      success: "Your Stripe acct is connected. Your are ready to accept payments!"

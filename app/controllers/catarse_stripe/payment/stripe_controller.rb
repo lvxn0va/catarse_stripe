@@ -14,7 +14,7 @@ module CatarseStripe::Payment
     before_filter :setup_auth_gateway
 
     SCOPE = "projects.backers.checkout"
-    SCOPE = "users.projects"
+    AUTH_SCOPE = "users.auth"
 
     layout :false
 
@@ -40,8 +40,13 @@ module CatarseStripe::Payment
       @user.stripe_userid = response.params['stripe_user_id']
       @user.save
 
-
+      stripe_auth_flash_success
       redirect_to(main_app.user_path(@user.primary)) if @user.primary
+    rescue Stripe::AuthenticationError => e
+      ::Airbrake.notify({ :error_class => "Stripe #Pay Error", :error_message => "Stripe #Pay Error: #{e.inspect}", :parameters => params}) rescue nil
+      Rails.logger.info "-----> #{e.inspect}"
+      flash[:error] = e.message
+      return redirect_to(main_app.user_path(@user.primary)) if @user.primary
     end
 
     def review
@@ -189,6 +194,14 @@ module CatarseStripe::Payment
 
     def stripe_flash_success
       flash[:success] = t('success', scope: SCOPE)
+    end
+
+    def stripe_auth_flash_error
+      flash[:failure] = t('stripe_error', scope: AUTH_SCOPE)
+    end
+
+    def stripe_auth_flash_success
+      flash[:success] = t('success', scope: AUTH_SCOPE)
     end
   end
 end

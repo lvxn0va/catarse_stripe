@@ -187,9 +187,6 @@ module CatarseStripe::Payment
         :authorize_url => '/oauth/authorize',
         :token_url => '/oauth/token'
       })
-      else
-        puts "[Stripe] ClientId key is required to make requests to Stripe"
-      end
     end
   end
 end

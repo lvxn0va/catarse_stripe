@@ -42,8 +42,10 @@ module CatarseStripe::Payment
       :headers => {'Authorization' => "Bearer #{(::Configuration['stripe_secret_key'])}"} #Platform Secret Key
       })
       @user.stripe_access_token = response.token
-      @user.stripe_key = response.stripe_publishable_key
-      @user.stripe_userid = response.stripe_user_id
+      @user.stripe_key = response.params['stripe_publishable_key']
+      @user.stripe_userid = response.params['stripe_user_id']
+      @user.save
+
 
       return redirect_to(user_path(@user.primary)) if @user.primary
     end

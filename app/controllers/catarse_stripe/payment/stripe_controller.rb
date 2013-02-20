@@ -20,7 +20,11 @@ module CatarseStripe::Payment
 
     #Makes the call to @client.auth_code.authorize_url from auth.html.erg
     def auth
-      @user = current_user
+      if devise?
+        @user = User.find params[:id]
+      else
+       @user = current_user
+       
       respond_to do |format|
         format.html
         format.js
@@ -30,9 +34,11 @@ module CatarseStripe::Payment
     #Brings back the authcode from Stripe and makes another call to Stripe to convert to a authtoken
     def callback
       code = params[:code]
-      @user = current_user
-
-      puts "received Stripe AuthCode"
+      
+      if devise?
+        @user = User.find params[:id]
+      else
+       @user = current_user
       
       response = @client.auth_code.get_token(code, {
       :headers => {'Authorization' => "Bearer #{(::Configuration['stripe_secret_key'])}"} #Platform Secret Key

@@ -187,7 +187,7 @@ module CatarseStripe::Payment
     end
 
     def setup_auth_gateway
-      STRIPE_OAUTH = OAuth2::Client.new('ca_1FKABuNtvsrKB1mWUgv7ICkDdchk0Sgf', 'h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V', {
+      OAuth2::Client.new('ca_1FKABuNtvsrKB1mWUgv7ICkDdchk0Sgf', 'h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V', {
         :site => 'https://connect.stripe.com',
         :authorize_url => '/oauth/authorize',
         :token_url => '/oauth/token'

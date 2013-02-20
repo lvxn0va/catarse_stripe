@@ -24,7 +24,7 @@ module CatarseStripe::Payment
         @user = User.find params[:id]
       else
        @user = current_user
-       
+
       respond_to do |format|
         format.html
         format.js
@@ -40,9 +40,12 @@ module CatarseStripe::Payment
       else
        @user = current_user
       
+      puts 'received Stipe auth code #{code}'
+
       response = @client.auth_code.get_token(code, {
       :headers => {'Authorization' => "Bearer #{(::Configuration['stripe_secret_key'])}"} #Platform Secret Key
       })
+
       #Save the User's attached access_token and Stripe acct info
       @user.stripe_access_token = response.token
       @user.stripe_key = response.params['stripe_publishable_key']

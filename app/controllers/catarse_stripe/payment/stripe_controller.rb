@@ -20,10 +20,10 @@ module CatarseStripe::Payment
 
     #Makes the call to @client.auth_code.authorize_url from auth.html.erg
     def auth
-      if devise?
-        @user = User.find params[:id]
-      else
-       @user = current_user
+      
+      unless @user = current_user
+        @user = User.find_by_id params[:id]
+      end
 
       respond_to do |format|
         format.html
@@ -35,10 +35,9 @@ module CatarseStripe::Payment
     def callback
       code = params[:code]
       
-      if devise?
-        @user = User.find params[:id]
-      else
-       @user = current_user
+      unless @user = current_user
+        @user = User.find_by_id params[:id]
+      end
       
       puts 'received Stipe auth code #{code}'
 
@@ -54,11 +53,11 @@ module CatarseStripe::Payment
 
       stripe_auth_flash_success
       redirect_to(main_app.user_path(@user.primary)) if @user.primary
-    rescue Stripe::AuthenticationError => e
-      ::Airbrake.notify({ :error_class => "Stripe #Pay Error", :error_message => "Stripe #Pay Error: #{e.inspect}", :parameters => params}) rescue nil
-      Rails.logger.info "-----> #{e.inspect}"
-      flash[:error] = e.message
-      return redirect_to(main_app.user_path(@user.primary)) if @user.primary
+    #rescue Stripe::AuthenticationError => e
+      #::Airbrake.notify({ :error_class => "Stripe #Pay Error", :error_message => "Stripe #Pay Error: #{e.inspect}", :parameters => params}) rescue nil
+      #Rails.logger.info "-----> #{e.inspect}"
+      #flash[:error] = e.message
+      #return redirect_to(main_app.user_path(@user.primary)) if @user.primary
     end
 
     def review

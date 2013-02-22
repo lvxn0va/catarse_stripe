@@ -61,9 +61,9 @@ Just above the #password field and in the My_Data section, add the following in 
     ul
       li
         - if @user.stripe_key.blank?
-          = link_to( image_tag('auth/stripe_blue.png'), '/payment/stripe/auth')
+          = link_to( image_tag('catarse_stripe/auth/stripe_blue.png'), '/payment/stripe/auth')
         - else
-          = image_tag 'auth/stripe-solid.png'
+          = image_tag 'catarse_stripe/auth/stripe-solid.png'
           br
           p= t('.stripe_key_info')
           p= @user.stripe_key
@@ -74,7 +74,49 @@ Just above the #password field and in the My_Data section, add the following in 
 
 This will create a button in the User/settings tab to connect to the catarse_stripe auth and get a UserID, Secretkey and PublicKey for the User/Project Owner. 
 
-You'll then need to copy those keys to the matchin columns in the projects table.  You can do this automatically when a created project is loaded by adding this to the bottom of app/controllers/projects_controller.rb:  
+ADDITIONALLY, you can allow your users to create a new user account and signin via Omniauth. This would take care of two things:  
+
+1) New User would have a new Catarse account, as an alternative to linking their Google/Twitter/Facebook accounts
+2) This user connected with Stripe will also be ready to create projects and accept payments without having to connect to Stripe in the User#Settings section.
+
+Setting up Omniauth for Stripe is exactly like setting up other providers. Add provider :stripe_connect into omniauth.rb:
+    
+    #/app/config/initializers/omniauth.rb
+
+    ....
+    
+    Rails.application.config.middleware.use OmniAuth::Builder do  
+      use OmniAuth::Strategies::OpenID, :store => OpenID::Store::Filesystem.new("#{Rails.root}/tmp")
+
+      provider :open_id, :name => 'google', :identifier => 'https://www.google.com/accounts/o8/id'
+      provider :open_id, :name => 'yahoo', :identifier => 'yahoo.com'
+       provider :facebook, ENV['FACEBOOK_APP_ID'], ENV['FACEBOOK_APP_SECRET'], {:client_options => {:ssl => {:ca_path => "/etc/ssl/certs"}}, :scope => 'publish_stream,email'}
+      provider :stripe_connect, Configuration['stripe_client_id'], Configuration['stripe_secret_key'], {:scope => 'read_write', :stripe_landing => 'register'}
+    
+    ...  
+
+And copy your User's new keys to the appropriate columns in the database:  
+    
+    ...
+
+    def self.create_with_omniauth(auth)
+        ...
+
+        if auth["provider"] == "facebook"
+          user.image_url = "https://graph.facebook.com/#{auth['uid']}/picture?type=large"
+        end
+        
+        #New Stripe User keys to database
+        if auth["provider"] == "stripe_connect"
+          user.stripe_key = auth["info"]["stripe_publishable_key"]
+          user.stripe_userid = auth["uid"]
+          user.stripe_access_token = auth["credentials"]["token"]
+        end
+
+      ...
+    end  
+
+Now that you've created your auth points, you'll then need to copy those keys to the matching columns in the projects table.  You can do this automatically when a created project is loaded by adding this to the bottom of app/controllers/projects_controller.rb:  
 
     def check_for_stripe_keys
       if @project.stripe_userid.nil?

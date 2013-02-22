@@ -31,7 +31,9 @@ Configure the routes for your Catarse application. Add the following lines in th
 
 ### Configurations  
 
-Signup for an account at [STRIPE PAYMENTS](http://www.stripe.com) - Go into your account settings and get your API Keys - Be sure to use your 'Test' keys until you're ready to go live. Alos make sure the live/test toggle in the Dashboard is appropriately set.
+Signup for an account at [STRIPE PAYMENTS](http://www.stripe.com) - Go into your account settings and get your API Keys - Be sure to use your 'Test' keys until you're ready to go live. Alos make sure the live/test toggle in the Dashboard is appropriately set.  
+
+You'll also need to register your application with Stripe to allow you to create new Project owners and collect an app fee from them as a Catarse Platform owner. In Account Settings, go to Applications and fill out the info. When approved, add your ":stripe_client_id" to configurations as below.  
 
 Create this configurations into Catarse database:
 
@@ -51,10 +53,13 @@ NOTE: Be sure to add the correct keys from the API section of your Stripe accoun
 
 ### Authorization
 
-Users who will be creating projects can now create and connect a Stripe.com project payments account. This is the account that will receive funds for each project.  
+Users who will be creating projects can now create and connect a Stripe.com project payments account. This is the account that will receive funds for each project. At this beta stage you will need to make some changes to your catarse app manually to get the buttons and links setup.  
 
-Just above the #password field and in the My_Data section, add the following in `app/views/users/_current_user_fields.html.slim`:  
+TODO= Add auto insertion for following code to catarse_stripe rake tasks and engine install.  
+
+Just above the "#password" field and in the "My_Data" section, add the following in:  
     
+    #app/views/users/_current_user_fields.html.slim
     ...
     #payment_gateways
     h1= t('.payment_gateways')
@@ -76,10 +81,10 @@ This will create a button in the User/settings tab to connect to the catarse_str
 
 ADDITIONALLY, you can allow your users to create a new user account and signin via Omniauth. This would take care of two things:  
 
-1) New User would have a new Catarse account, as an alternative to linking their Google/Twitter/Facebook accounts
-2) This user connected with Stripe will also be ready to create projects and accept payments without having to connect to Stripe in the User#Settings section.
+1) New User would have a new Catarse account, as an alternative to linking their Google/Twitter/Facebook accounts.  
+2) This user connected with Stripe will also be ready to create projects and accept payments without having to connect to Stripe in the User#Settings section.  
 
-Setting up Omniauth for Stripe is exactly like setting up other providers. Add provider :stripe_connect into omniauth.rb:
+Setting up Omniauth for Stripe is exactly like setting up other providers. Add provider :stripe_connect into omniauth.rb after "facebook":  
     
     #/app/config/initializers/omniauth.rb
 
@@ -90,12 +95,12 @@ Setting up Omniauth for Stripe is exactly like setting up other providers. Add p
 
       provider :open_id, :name => 'google', :identifier => 'https://www.google.com/accounts/o8/id'
       provider :open_id, :name => 'yahoo', :identifier => 'yahoo.com'
-       provider :facebook, ENV['FACEBOOK_APP_ID'], ENV['FACEBOOK_APP_SECRET'], {:client_options => {:ssl => {:ca_path => "/etc/ssl/certs"}}, :scope => 'publish_stream,email'}
+      provider :facebook, ENV['FACEBOOK_APP_ID'], ENV['FACEBOOK_APP_SECRET'], {:client_options => {:ssl => {:ca_path => "/etc/ssl/certs"}}, :scope => 'publish_stream,email'}
       provider :stripe_connect, Configuration['stripe_client_id'], Configuration['stripe_secret_key'], {:scope => 'read_write', :stripe_landing => 'register'}
     
     ...  
 
-And copy your User's new keys to the appropriate columns in the database:  
+And copy your User's new keys to the appropriate columns in the database. After the "facebook" section:  
     
     ...
 
@@ -116,8 +121,10 @@ And copy your User's new keys to the appropriate columns in the database:
       ...
     end  
 
-Now that you've created your auth points, you'll then need to copy those keys to the matching columns in the projects table.  You can do this automatically when a created project is loaded by adding this to the bottom of app/controllers/projects_controller.rb:  
-
+Now that you've created your auth points, you'll then need to copy those keys to the matching columns in the projects table.  You can do this automatically when a created project is loaded by adding this to the bottom of the projects controller code:  
+    
+    #app/controllers/projects_controller.rb
+    ...
     def check_for_stripe_keys
       if @project.stripe_userid.nil?
         [:stripe_access_token, :stripe_key, :stripe_userid].each do |field|
@@ -130,8 +137,9 @@ Now that you've created your auth points, you'll then need to copy those keys to
       end
       @project.save
     end  
+    ...
 
-The insert `check_for_stripe_keys` in the :show method above 'show!'  like so:
+The insert `check_for_stripe_keys` in the :show method above the 'show!' entry like so:
     
     ...
     check_for_stripe_keys
@@ -145,7 +153,7 @@ The insert `check_for_stripe_keys` in the :show method above 'show!'  like so:
       }
      ...
 
-As well as in the :create method after the bitly section like so:  
+As well as in the :create method after the "bitly" section like so:  
     
     ...
     unless @project.new_record?

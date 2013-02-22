@@ -2,6 +2,7 @@ require 'catarse_stripe/processors'
 require 'json'
 require 'stripe'
 require 'oauth2'
+require 'rest_client'
 
 module CatarseStripe::Payment
     class StripeController < ApplicationController
@@ -20,7 +21,7 @@ module CatarseStripe::Payment
 
     #Makes the call to @client.auth_code.authorize_url from auth.html.erg
     def auth
-      @user = current_user
+      @stripe_user = current_user
       respond_to do |format|
         format.html
         format.js
@@ -29,24 +30,20 @@ module CatarseStripe::Payment
 
     #Brings back the authcode from Stripe and makes another call to Stripe to convert to a authtoken
     def callback
-      @user = current_user
+      @stripe_user = current_user
       code = params[:code]
-      
-      puts 'received Stipe auth code #{code}'
 
-      response = @client.auth_code.get_token(code, {
+      @response = @client.auth_code.get_token(code, {
       :headers => {'Authorization' => "Bearer h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V"} #Platform Secret Key
       })
 
-      
-      #Save the User's attached access_token and Stripe acct info
-      @user.token = response.token
-      @user.stripe_key = response.params['stripe_publishable_key']
-      @user.stripe_userid = response.params['stripe_user_id']
-      @user.save
+      @stripe_user.stripe_access_token = @response.token
+      @stripe_user.stripe_key = @response.params['stripe_publishable_key']
+      @stripe_user.stripe_userid = @response.params['stripe_user_id']
+      @stripe_user.save
 
-      stripe_auth_flash_success
-      redirect_to(main_app.user_path(@user.primary)) if @user.primary
+      
+      return redirect_to payment_stripe_auth_path(@user)
     #rescue Stripe::AuthenticationError => e
       #::Airbrake.notify({ :error_class => "Stripe #Pay Error", :error_message => "Stripe #Pay Error: #{e.inspect}", :parameters => params}) rescue nil
       #Rails.logger.info "-----> #{e.inspect}"
@@ -181,6 +178,8 @@ module CatarseStripe::Payment
   private
     #Setup the Oauth2 Stripe call with needed params - See initializers.stripe..rb..the Stripe keys are setup in the seed.db or added manually with a Configuration.create! call.
     def setup_auth_gateway
+      session[:oauth] ||= {}
+
       @client = OAuth2::Client.new((::Configuration['stripe_client_id']), (::Configuration['stripe_access_token']), {
         :site => 'https://connect.stripe.com',
         :authorize_url => '/oauth/authorize',

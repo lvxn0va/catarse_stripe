@@ -16,7 +16,7 @@
         margin-left: auto; 
         margin-right: auto;
         }
-    div.stripe-field .stripe-connect-btn { text-align: center;}
+    div.stripe-field .stripe-connect-btn { text-align: left;}
     </style>
   </head>
   <body>
@@ -32,6 +32,18 @@
                             <img src="/assets/auth/stripe_blue.png">
                         </a>
                     </p>
+                    <li>
+                      User: 
+                      <% if current_user %>
+                        <%= current_user.name %>
+                        <div> Stripe User:
+                          <%= @stripe_user.name %>
+                          <%= @stripe_user.uid %>
+                        </div>
+                      <% else %>
+                        (not logged in)
+                      <% end %>
+                    </li>
 				</stripe-field>
 				<script src="http://code.jquery.com/jquery.js"></script>
 				<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>

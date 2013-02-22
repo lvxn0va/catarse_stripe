@@ -2,7 +2,6 @@ require 'catarse_stripe/processors'
 require 'json'
 require 'stripe'
 require 'oauth2'
-require 'rest_client'
 
 module CatarseStripe::Payment
     class StripeController < ApplicationController

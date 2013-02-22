@@ -34,21 +34,22 @@ module CatarseStripe::Payment
       code = params[:code]
 
       @response = @client.auth_code.get_token(code, {
-      :headers => {'Authorization' => "Bearer h0Thupyoyl1xtX6OOLQ9B2QWaARDpt2V"} #Platform Secret Key
+      :headers => {'Authorization' => "Bearer(::Configuration['stripe_secret_key'])"} #Platform Secret Key
       })
-
+      
+      #Save PROJECT owner's new keys
       @stripe_user.stripe_access_token = @response.token
       @stripe_user.stripe_key = @response.params['stripe_publishable_key']
       @stripe_user.stripe_userid = @response.params['stripe_user_id']
       @stripe_user.save
 
       
-      return redirect_to payment_stripe_auth_path(@user)
-    #rescue Stripe::AuthenticationError => e
-      #::Airbrake.notify({ :error_class => "Stripe #Pay Error", :error_message => "Stripe #Pay Error: #{e.inspect}", :parameters => params}) rescue nil
-      #Rails.logger.info "-----> #{e.inspect}"
-      #flash[:error] = e.message
-      #return redirect_to(main_app.user_path(@user.primary)) if @user.primary
+      return redirect_to payment_stripe_auth_path(@stripe_user)
+    rescue Stripe::AuthenticationError => e
+      ::Airbrake.notify({ :error_class => "Stripe #Pay Error", :error_message => "Stripe #Pay Error: #{e.inspect}", :parameters => params}) rescue nil
+      Rails.logger.info "-----> #{e.inspect}"
+      flash[:error] = e.message
+      return redirect_to main_app.user_path(@stripe_user)
     end
 
     def review
@@ -114,7 +115,6 @@ module CatarseStripe::Payment
 
         response = Stripe::Charge.create(
           {
-          #card: token,
           customer: @backer.payment_token,
           amount: @backer.price_in_cents,
           currency: 'usd',

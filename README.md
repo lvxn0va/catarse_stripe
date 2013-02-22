@@ -1,9 +1,11 @@
 ## The stripe_controller is a work in progress and things will be changing very rapidly. BEWARE!
-### Tests are non-funtional at this point and will be adjusted to Stripe soon!
+### Tests are non-functional at this point and will be adjusted to Stripe soon!
 
 # CatarseStripe
 
-Catarse Stripe integration with [Catarse](http://github.com/danielweinmann/catarse) crowdfunding platform
+Catarse Stripe integration with [Catarse](http://github.com/danielweinmann/catarse) crowdfunding platform. 
+
+So far, catarse_stripe uses Omniauth for an auth connection and to use Catarse as a Platform app. See the wiki on how to use Stripe-Connect.
 
 ## Installation
 
@@ -16,6 +18,11 @@ And then execute:
 
     $ bundle
 
+Install the database migrations
+
+    bundle exec rake catarse_stripe:install:migrations
+    bundle exec rake db:migrate
+    
 ## Usage
 
 Configure the routes for your Catarse application. Add the following lines in the routes file (config/routes.rb):
@@ -35,8 +42,76 @@ In Rails console, run this:
     Configuration.create!(name: "stripe_api_key", value: "API_KEY")
     Configuration.create!(name: "stripe_secret_key", value: "SECRET_KEY")
     Configuration.create!(name: "stripe_test", value: "TRUE/FALSE")
+    
+If you've already created your application and been approved at Stripe.com add your Client_id  
 
-    NOTE: Be sure to add the correct keys from the API section of your Stripe account settings. Stripe_Test: TRUE = Using Stripe Test Server/Sandbox Mode / FALSE = Using Stripe live server.  
+    Configuration.create!(name: "stripe_client_id", value: "STRIPE_CLIENT_ID")  
+
+NOTE: Be sure to add the correct keys from the API section of your Stripe account settings. Stripe_Test: TRUE = Using Stripe Test Server/Sandbox Mode / FALSE = Using Stripe live server.  
+
+### Authorization
+
+Users who will be creating projects can now create and connect a Stripe.com project payments account. This is the account that will receive funds for each project.  
+
+Just above the #password field and in the My_Data section, add the following in `app/views/users/_current_user_fields.html.slim`:  
+    
+    ...
+    #payment_gateways
+    h1= t('.payment_gateways')
+    ul
+      li
+        - if @user.stripe_key.blank?
+          = link_to( image_tag('auth/stripe_blue.png'), '/payment/stripe/auth')
+        - else
+          = image_tag 'auth/stripe-solid.png'
+          br
+          p= t('.stripe_key_info')
+          p= @user.stripe_key
+          br
+          p= t('.stripe_customer_info')
+          p= @user.stripe_userid
+          ...
+
+This will create a button in the User/settings tab to connect to the catarse_stripe auth and get a UserID, Secretkey and PublicKey for the User/Project Owner. 
+
+You'll then need to copy those keys to the matchin columns in the projects table.  You can do this automatically when a created project is loaded by adding this to the bottom of app/controllers/projects_controller.rb:  
+
+    def check_for_stripe_keys
+      if @project.stripe_userid.nil?
+        [:stripe_access_token, :stripe_key, :stripe_userid].each do |field|
+          @project.send("#{field.to_s}=", @project.user.send(field).dup)
+        end
+      elsif @project.stripe_userid != @project.user.stripe_userid
+        [:stripe_access_token, :stripe_key, :stripe_userid].each do |field|
+          @project.send("#{field.to_s}=", @project.user.send(field).dup)
+        end
+      end
+      @project.save
+    end  
+
+The insert `check_for_stripe_keys` in the :show method above 'show!'  like so:
+    
+    ...
+    check_for_stripe_keys
+
+      show!{
+        @title = @project.name
+        @rewards = @project.rewards.order(:minimum_value).all
+        @backers = @project.backers.confirmed.limit(12).order("confirmed_at DESC").all
+        fb_admins_add(@project.user.facebook_id) if @project.user.facebook_id
+        @update = @project.updates.where(:id => params[:update_id]).first if params[:update_id].present?
+      }
+     ...
+
+As well as in the :create method after the bitly section like so:  
+    
+    ...
+    unless @project.new_record?
+      @project.reload
+      @project.update_attributes({ short_url: bitly })
+    end
+    check_for_stripe_keys
+    ...
 
 ## Development environment setup
 

@@ -33,7 +33,7 @@ module CatarseStripe::Payment
       code = params[:code]
 
       @response = @client.auth_code.get_token(code, {
-      :headers => {'Authorization' => "Bearer(::Configuration['stripe_secret_key'])"} #Platform Secret Key
+      :headers => {'Authorization' => "Bearer #{::Configuration['stripe_secret_key']}"} #Platform Secret Key
       })
       
       #Save PROJECT owner's new keys

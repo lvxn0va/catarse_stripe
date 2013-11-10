@@ -56,6 +56,21 @@ module CatarseStripe::Payment
     end
 
     def ipn
+      event_json = JSON.parse(request.body.read)
+      id = event_json["id"]
+      if data_json[:type] == "charge.succeeded"
+        details = Stripe::Event.retrieve(id: id)
+        if details.paid = true
+         build_notification(backer, details)
+         render status: 200, nothing: true
+        else
+         render status: 404, nothing: true
+        end
+      end
+    rescue Stripe::CardError => e
+      ::Airbrake.notify({ :error_class => "Stripe Notification Error", :error_message => "Stripe Notification Error: #{e.inspect}", :parameters => params}) rescue nil
+      render status: 404, nothing: true
+=begin
       backer = Backer.where(:payment_id => details.id).first
       if backer
         notification = backer.payment_notifications.new({
@@ -68,6 +83,7 @@ module CatarseStripe::Payment
     rescue Stripe::CardError => e
       ::Airbrake.notify({ :error_class => "Stripe Notification Error", :error_message => "Stripe Notification Error: #{e.inspect}", :parameters => params}) rescue nil
       return render status: 200, nothing: true
+=end
     end
 
     def notifications

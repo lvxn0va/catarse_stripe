@@ -63,7 +63,7 @@ module CatarseStripe::Payment
         charge = details.data.object
         customer = Stripe::Customer.retrieve(charge.customer, stripe_key)
         backer = Backer.where(:payment_id => charge.id.first)
-        #if backer
+        if backer
         #  notification = backer.payment_notifications.new({
         #    extra_data: customer.email
         #  })

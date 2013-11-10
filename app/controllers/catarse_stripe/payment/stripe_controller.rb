@@ -60,6 +60,7 @@ module CatarseStripe::Payment
       id = event_json["id"]
       if data_json[:type] == "charge.succeeded"
         details = Stripe::Event.retrieve(id: id)
+        backer = Backer.where(:payment_id => id).first
         if details.paid = true
          build_notification(backer, details)
          render status: 200, nothing: true

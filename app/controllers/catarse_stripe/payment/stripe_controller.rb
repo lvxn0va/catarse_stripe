@@ -71,6 +71,7 @@ module CatarseStripe::Payment
             backer.confirm! unless backer.confirmed
           end
         end
+        return render status: 200, nothing: true
       else
         return render status: 200, nothing: true
       end

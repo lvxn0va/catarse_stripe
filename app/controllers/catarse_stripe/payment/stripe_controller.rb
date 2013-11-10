@@ -58,33 +58,28 @@ module CatarseStripe::Payment
     def ipn
       event_json = JSON.parse(request.body.read)
       id = event_json["id"]
-      if event_json[:type] == "charge.succeeded"
+      if event_json["type"] == "charge.succeeded"
         details = Stripe::Event.retrieve(id: id)
-        backer = Backer.where(:payment_id => id).first
-        if details.paid = true
-         build_notification(backer, details)
-         render status: 200, nothing: true
-        else
-         render status: 404, nothing: true
+        charge = details.data.object
+        customer = Stripe::Customer.retrieve(id: charge.card.customer)
+        backer = Backer.where(:payment_id => charge.id.first)
+        if backer
+          notification = backer.payment_notifications.new({
+            extra_data: customer.email
+          })
+          notification.save!
+          backer.update_attribute :payment_service_fee => ((charge.amount * ::Configuration['catarse_fee'].to_f) / 100
+          if charge.paid == true
+            backer.confirm! unless backer.confirmed
+          end
         end
+        return render status: 200, nothing: true
+      else
+        return render status: 200, nothing: true
       end
     rescue Stripe::CardError => e
       ::Airbrake.notify({ :error_class => "Stripe Notification Error", :error_message => "Stripe Notification Error: #{e.inspect}", :parameters => params}) rescue nil
-      render status: 404, nothing: true
-=begin
-      backer = Backer.where(:payment_id => details.id).first
-      if backer
-        notification = backer.payment_notifications.new({
-          extra_data: JSON.parse(params.to_json.force_encoding(params['charset']).encode('utf-8'))
-        })
-        notification.save!
-        backer.update_attribute :payment_service_fee => details.fee
-      end
       return render status: 200, nothing: true
-    rescue Stripe::CardError => e
-      ::Airbrake.notify({ :error_class => "Stripe Notification Error", :error_message => "Stripe Notification Error: #{e.inspect}", :parameters => params}) rescue nil
-      return render status: 200, nothing: true
-=end
     end
 
     def notifications
@@ -176,7 +171,7 @@ module CatarseStripe::Payment
           backer.update_attribute :payment_id, details.id
         end
         stripe_flash_success
-        redirect_to main_app.thank_you_project_backer_path(project_id: backer.project.id, id: backer.id)
+        redirect_to main_app.project_backer_path(project_id: backer.project.id, id: backer.id)
       rescue Stripe::CardError => e
         ::Airbrake.notify({ :error_class => "Stripe Error", :error_message => "Stripe Error: #{e.message}", :parameters => params}) rescue nil
         Rails.logger.info "-----> #{e.inspect}"

@@ -56,10 +56,8 @@ module CatarseStripe::Payment
     end
 
     def ipn
-      event_json = JSON.parse(request.body.read)
-      id = event_json["id"]
-      if event_json["type"] == "charge.succeeded"
-        details = Stripe::Event.retrieve(id: id)
+      details = Stripe::Event.retrieve(params[:id])
+      if details.type == "charge.succeeded"
         charge = details.data.object
         customer = Stripe::Customer.retrieve(id: charge.card.customer)
         backer = Backer.where(:payment_id => charge.id.first)
@@ -73,7 +71,6 @@ module CatarseStripe::Payment
             backer.confirm! unless backer.confirmed
           end
         end
-        return render status: 200, nothing: true
       else
         return render status: 200, nothing: true
       end

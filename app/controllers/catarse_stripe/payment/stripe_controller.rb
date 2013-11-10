@@ -56,12 +56,12 @@ module CatarseStripe::Payment
     end
 
     def ipn
+      #return render status: 200, nothing: true if (details.livemode == false && Rails.env.production? == true)
       stripe_key = User.find_by_stripe_userid(params[:user_id]).stripe_access_token
       details = Stripe::Event.retrieve(params[:id], stripe_key)
-      return render status: 200, nothing: true if (details.livemode == true && Rails.env.production? == true)
       if details.type == "charge.succeeded"
         charge = details.data.object
-        customer = Stripe::Customer.retrieve(id: charge.card.customer)
+        customer = Stripe::Customer.retrieve(charge.card.customer, stripe_key)
         backer = Backer.where(:payment_id => charge.id.first)
         if backer
           notification = backer.payment_notifications.new({

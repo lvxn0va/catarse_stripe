@@ -70,7 +70,7 @@ module CatarseStripe::Payment
           notification.save!
           backer.update_attribute(:payment_service_fee, (charge.amount * ::Configuration['catarse_fee'].to_f) / 100 )
           if charge.paid == true
-            backer.confirm! unless backer.confirmed
+            backer.confirm!
           end
         end
         return render status: 200, nothing: true

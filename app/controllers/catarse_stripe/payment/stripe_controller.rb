@@ -56,6 +56,7 @@ module CatarseStripe::Payment
     end
 
     def ipn
+      Stripe.api_key = ::Configuration['stripe_secret_key']
       details = Stripe::Event.retrieve(params[:id])
       return render status: 200, nothing: true if (details.livemode == true && Rails.env.production? == true)
       if details.type == "charge.succeeded"

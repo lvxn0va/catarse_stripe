@@ -57,6 +57,7 @@ module CatarseStripe::Payment
 
     def ipn
       details = Stripe::Event.retrieve(params[:id])
+      return render status: 200, nothing: true if (details.livemode == true && Rails.env.production? == true)
       if details.type == "charge.succeeded"
         charge = details.data.object
         customer = Stripe::Customer.retrieve(id: charge.card.customer)

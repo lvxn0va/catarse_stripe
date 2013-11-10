@@ -58,7 +58,7 @@ module CatarseStripe::Payment
     def ipn
       event_json = JSON.parse(request.body.read)
       id = event_json["id"]
-      if data_json[:type] == "charge.succeeded"
+      if event_json[:type] == "charge.succeeded"
         details = Stripe::Event.retrieve(id: id)
         backer = Backer.where(:payment_id => id).first
         if details.paid = true

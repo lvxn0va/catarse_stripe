@@ -63,11 +63,11 @@ module CatarseStripe::Payment
         charge = details.data.object
         customer = Stripe::Customer.retrieve(charge.customer, stripe_key)
         backer = Backer.where(:payment_id => charge.id.first)
-        if backer
-          notification = backer.payment_notifications.new({
-            extra_data: customer.email
-          })
-          notification.save!
+        #if backer
+        #  notification = backer.payment_notifications.new({
+        #    extra_data: customer.email
+        #  })
+        # notification.save!
           backer.update_attribute :payment_service_fee => (charge.amount * ::Configuration['catarse_fee'].to_f) / 100
           if charge.paid == true
             backer.confirm! unless backer.confirmed

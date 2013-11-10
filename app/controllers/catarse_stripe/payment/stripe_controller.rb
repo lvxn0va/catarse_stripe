@@ -61,7 +61,7 @@ module CatarseStripe::Payment
       details = Stripe::Event.retrieve(params[:id], stripe_key)
       if details.type == "charge.succeeded"
         charge = details.data.object
-        customer = Stripe::Customer.retrieve(charge.card.customer, stripe_key)
+        customer = Stripe::Customer.retrieve(charge.customer, stripe_key)
         backer = Backer.where(:payment_id => charge.id.first)
         if backer
           notification = backer.payment_notifications.new({

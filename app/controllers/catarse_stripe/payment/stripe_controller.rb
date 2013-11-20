@@ -83,6 +83,7 @@ module CatarseStripe::Payment
         if charge.paid == true
           backer.confirm!
         end
+      end
     end
 
     def refund_backer(details)

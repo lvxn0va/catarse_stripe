@@ -60,19 +60,10 @@ module CatarseStripe::Payment
       stripe_key = User.find_by_stripe_userid(params[:user_id]).stripe_access_token
       details = Stripe::Event.retrieve(params[:id], stripe_key)
       if details.type == "charge.succeeded"
-        charge = details.data.object
-        customer = Stripe::Customer.retrieve(charge.customer, stripe_key)
-        backer = Backer.where(:payment_id => charge.id).first
-        if backer
-          notification = backer.payment_notifications.new({
-            extra_data: customer.email
-          })
-          notification.save!
-          backer.update_attribute(:payment_service_fee, (charge.amount * ::Configuration['catarse_fee'].to_f) / 100 )
-          if charge.paid == true
-            backer.confirm!
-          end
-        end
+        confirm_backer(details)
+      elsif details.type == "charge.refunded"
+        refund_backer(details)
+      end
         return render status: 200, nothing: true
       else
         return render status: 200, nothing: true
@@ -80,6 +71,30 @@ module CatarseStripe::Payment
     rescue Stripe::CardError => e
       ::Airbrake.notify({ :error_class => "Stripe Notification Error", :error_message => "Stripe Notification Error: #{e.inspect}", :parameters => params}) rescue nil
       return render status: 200, nothing: true
+    end
+
+    def confirm_backer(details)
+      charge = details.data.object
+      customer = Stripe::Customer.retrieve(charge.customer, stripe_key)
+      backer = Backer.where(:payment_id => charge.id).first
+      if backer
+        notification = backer.payment_notifications.new({
+          extra_data: customer.email
+        })
+        notification.save!
+        backer.update_attribute(:payment_service_fee, (charge.amount * ::Configuration['catarse_fee'].to_f) / 100 )
+        if charge.paid == true
+          backer.confirm!
+        end
+    end
+
+    def refund_backer(details)
+      charge = details.data.object
+      customer = Stripe::Customer.retrieve(charge.customer, stripe_key)
+      backer = Backer.where(:payment_id => charge.id).first
+      if backer
+        backer.refund! if !backer.refunded?
+      end
     end
 
     def notifications

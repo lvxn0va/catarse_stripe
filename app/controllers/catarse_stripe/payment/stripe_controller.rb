@@ -64,10 +64,7 @@ module CatarseStripe::Payment
       elsif details.type == "charge.refunded"
         refund_backer(details)
       end
-        return render status: 200, nothing: true
-      else
-        return render status: 200, nothing: true
-      end
+      return render status: 200, nothing: true
     rescue Stripe::CardError => e
       ::Airbrake.notify({ :error_class => "Stripe Notification Error", :error_message => "Stripe Notification Error: #{e.inspect}", :parameters => params}) rescue nil
       return render status: 200, nothing: true

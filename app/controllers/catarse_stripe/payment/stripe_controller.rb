@@ -86,9 +86,8 @@ module CatarseStripe::Payment
       end
     end
 
-    def refund_backer(details, stripe_key)
+    def refund_backer(details)
       charge = details.data.object
-      customer = Stripe::Customer.retrieve(charge.customer, stripe_key)
       backer = Backer.where(:payment_id => charge.id).first
       if backer
         backer.refund! if !backer.refunded?

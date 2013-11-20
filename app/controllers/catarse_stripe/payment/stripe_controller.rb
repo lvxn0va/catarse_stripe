@@ -60,9 +60,9 @@ module CatarseStripe::Payment
       stripe_key = User.find_by_stripe_userid(params[:user_id]).stripe_access_token
       details = Stripe::Event.retrieve(params[:id], stripe_key)
       if details.type == "charge.succeeded"
-        confirm_backer(details)
+        confirm_backer(details,stripe_key)
       elsif details.type == "charge.refunded"
-        refund_backer(details)
+        refund_backer(details, stripe_key)
       end
       return render status: 200, nothing: true
     rescue Stripe::CardError => e
@@ -70,7 +70,7 @@ module CatarseStripe::Payment
       return render status: 200, nothing: true
     end
 
-    def confirm_backer(details)
+    def confirm_backer(details, stripe_key)
       charge = details.data.object
       customer = Stripe::Customer.retrieve(charge.customer, stripe_key)
       backer = Backer.where(:payment_id => charge.id).first
@@ -86,7 +86,7 @@ module CatarseStripe::Payment
       end
     end
 
-    def refund_backer(details)
+    def refund_backer(details, stripe_key)
       charge = details.data.object
       customer = Stripe::Customer.retrieve(charge.customer, stripe_key)
       backer = Backer.where(:payment_id => charge.id).first

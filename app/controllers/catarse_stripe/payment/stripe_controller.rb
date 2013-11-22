@@ -43,7 +43,7 @@ module CatarseStripe::Payment
       @stripe_user.save
 
       
-      return redirect_to payment_stripe_auth_path(@stripe_user)
+      return redirect_to payment_stripe_auth_path
     rescue Stripe::AuthenticationError => e
       ::Airbrake.notify({ :error_class => "Stripe #Pay Error", :error_message => "Stripe #Pay Error: #{e.inspect}", :parameters => params}) rescue nil
       Rails.logger.info "-----> #{e.inspect}"

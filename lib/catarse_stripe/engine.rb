@@ -3,7 +3,7 @@ module CatarseStripe
     isolate_namespace CatarseStripe
 
     config.to_prepare do
-      ApplicationController.helper(ApplicationHelper)
+      #ApplicationController.helper(ApplicationHelper)
     end
   end
 

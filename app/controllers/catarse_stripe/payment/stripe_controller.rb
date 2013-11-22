@@ -33,7 +33,7 @@ module CatarseStripe::Payment
       code = params[:code]
 
       @response = @client.auth_code.get_token(code, {
-      :headers => {'Authorization' => "Bearer(::Configuration['stripe_secret_key'])"} #Platform Secret Key
+      :headers => {'Authorization' => "Bearer #{::Configuration['stripe_secret_key']}"} #Platform Secret Key
       })
       
       #Save PROJECT owner's new keys
@@ -43,7 +43,7 @@ module CatarseStripe::Payment
       @stripe_user.save
 
       
-      return redirect_to payment_stripe_auth_path(@stripe_user)
+      return redirect_to payment_stripe_auth_path
     rescue Stripe::AuthenticationError => e
       ::Airbrake.notify({ :error_class => "Stripe #Pay Error", :error_message => "Stripe #Pay Error: #{e.inspect}", :parameters => params}) rescue nil
       Rails.logger.info "-----> #{e.inspect}"
@@ -56,18 +56,42 @@ module CatarseStripe::Payment
     end
 
     def ipn
-      backer = Backer.where(:payment_id => details.id).first
-      if backer
-        notification = backer.payment_notifications.new({
-          extra_data: JSON.parse(params.to_json.force_encoding(params['charset']).encode('utf-8'))
-        })
-        notification.save!
-        backer.update_attribute :payment_service_fee => details.fee
+      #return render status: 200, nothing: true if (details.livemode == false && Rails.env.production? == true)
+      stripe_key = User.find_by_stripe_userid(params[:user_id]).stripe_access_token
+      details = Stripe::Event.retrieve(params[:id], stripe_key)
+      if details.type == "charge.succeeded"
+        confirm_backer(details,stripe_key)
+      elsif details.type == "charge.refunded"
+        refund_backer(details, stripe_key)
       end
       return render status: 200, nothing: true
     rescue Stripe::CardError => e
       ::Airbrake.notify({ :error_class => "Stripe Notification Error", :error_message => "Stripe Notification Error: #{e.inspect}", :parameters => params}) rescue nil
       return render status: 200, nothing: true
+    end
+
+    def confirm_backer(details, stripe_key)
+      charge = details.data.object
+      customer = Stripe::Customer.retrieve(charge.customer, stripe_key)
+      backer = Backer.where(:payment_id => charge.id).first
+      if backer
+        notification = backer.payment_notifications.new({
+          extra_data: customer.email
+        })
+        notification.save!
+        backer.update_attribute(:payment_service_fee, (charge.amount * ::Configuration['catarse_fee'].to_f) / 100 )
+        if charge.paid == true
+          backer.confirm!
+        end
+      end
+    end
+
+    def refund_backer(details)
+      charge = details.data.object
+      backer = Backer.where(:payment_id => charge.id).first
+      if backer
+        backer.refund! if !backer.refunded?
+      end
     end
 
     def notifications
@@ -118,7 +142,7 @@ module CatarseStripe::Payment
           amount: @backer.price_in_cents,
           currency: 'usd',
           description: t('stripe_description', scope: SCOPE, :project_name => @backer.project.name, :value => @backer.display_value),
-          application_fee: @backer.platform_fee.to_i
+          application_fee: (@backer.price_in_cents * ::Configuration['catarse_fee'].to_f).to_i
           },
           access_token #ACCESS_TOKEN (Stripe Secret Key of Connected Project Owner NOT platform)
         )
@@ -159,7 +183,7 @@ module CatarseStripe::Payment
           backer.update_attribute :payment_id, details.id
         end
         stripe_flash_success
-        redirect_to main_app.thank_you_project_backer_path(project_id: backer.project.id, id: backer.id)
+        redirect_to main_app.project_backer_path(project_id: backer.project.id, id: backer.id)
       rescue Stripe::CardError => e
         ::Airbrake.notify({ :error_class => "Stripe Error", :error_message => "Stripe Error: #{e.message}", :parameters => params}) rescue nil
         Rails.logger.info "-----> #{e.inspect}"
